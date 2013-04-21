@@ -1,0 +1,49 @@
+[user]
+    name = Connor Williams
+    email = jricacosta+github@gmail.com
+[core]
+    excludesfile = ~/.gitignore
+[push]
+    default = tracking
+[alias]
+    hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    lgp =log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    cont = rebase --continue
+    abort = rebase --abort
+    br = branch
+    b = branch
+    ci = commit
+    cia = commit -a
+    cim = commit -m
+    ciam = commit -a -m
+    co = checkout
+    diffi = diff --color-words
+    diffw = diff -w
+    diffx = diff -w --color-words
+    diffc = diff --full-index --color-words
+    ff = pull --ff-only
+    f = merge --ff-only
+    st = status
+    d = diff --stat
+    g = log --graph --decorate
+    l = log --graph --decorate --pretty=oneline --abbrev-commit
+    la = log --graph --decorate --pretty=oneline --abbrev-commit --all
+[format]
+    pretty = medium # default is medium
+[log]
+    date = local
+[color]
+    ui = true
+[receive]
+    denyCurrentBranch = refuse
+[push]
+    default = tracking
+[merge]
+    defaultToUpstream = true
+    conflictstyle  = diff3
+[core]
+    safecrlf = true
+    autocrlf = false
+    eol = lf
+    whitespace = trailing-space,space-before-tab
