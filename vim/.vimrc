@@ -181,7 +181,6 @@ noremap <leader>dd <C-^>
 noremap <leader>da q:inorm ==j0<cr>
 noremap <leader>dr :set relativenumber! relativenumber?<cr>
 
-nnoremap <leader>e @
 nnoremap <leader>h <C-w>h
 nnoremap <leader>j <C-w>j
 nnoremap <leader>k <C-w>k
