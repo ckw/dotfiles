@@ -132,9 +132,9 @@ let mapleader=" "
 inoremap jk  <ESC>
 
 " Create Blank Newlines and stay in Normal mode, in same place
-nnoremap <silent> zj o<Esc>k
-nnoremap <silent> zk O<Esc>j
-nnoremap <silent> zjk O<Esc>jo<Esc>k
+nnoremap <silent> zj o<Esc>0d$k
+nnoremap <silent> zk O<Esc>0d$j
+nnoremap <silent> zjk O<Esc>0d$jo<Esc>0d$k
 nnoremap <leader>p ]p
 
 " Pull word under cursor into LHS of a substitute (for quick search and
