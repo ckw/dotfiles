@@ -156,9 +156,14 @@ nnoremap <leader>sv :source $MYVIMRC<cr>
 vnoremap <tab> %
 vnoremap / /\v
 vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
+
+"::::::::::::::::::::::::::::::::::::GIT::::::::;::::::::::::::::::::::::::::::
 nnoremap <leader>gj :GitGutterNextHunk<CR>
 nnoremap <leader>gk :GitGutterPrevHunk<CR>
 nnoremap <leader>gb :Gblame<CR>
+nnoremap <leader>gs :Gstatus<CR>
+":::::::::::::::::::::::::::::::::::::::::::::::;::::::::::::::::::::::::::::::
+"
 nnoremap <leader>dg :GundoToggle<CR>
 nnoremap <leader>y :YRShow<CR>
 noremap , "

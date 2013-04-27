@@ -9,6 +9,7 @@
 if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi
 
 export TERM=xterm-256color
+export PATH=/opt/ghc-7.4.2/bin:$PATH
 # Colors
 autoload -U colors
 colors
