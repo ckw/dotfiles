@@ -60,6 +60,10 @@ alias P='pushd'
 alias p='popd'
 alias L='less'
 alias g='git'
+alias gd='git diff'
+alias gs='git status'
+alias gcim='git cim'
+alias gap='git add -p'
 alias zk='/usr/share/zookeeper/bin/zkCli.sh'
 
   function zle-line-finish {
