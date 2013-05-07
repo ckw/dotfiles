@@ -78,8 +78,11 @@ if has("autocmd")
     autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
     autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 
-    autocmd FileType ruby nnoremap <leader>c I#<esc>
-    autocmd FileType haskell nnoremap <leader>c I--<esc>
+    autocmd FileType ruby com! PrependComment exec "norm! mq0i#\<Esc>`ql"
+    autocmd FileType ruby nnoremap <leader>c :PrependComment<CR>
+
+    autocmd FileType haskell com! PrependComment exec "norm! mq0i--\<Esc>`qll"
+    autocmd FileType haskell nnoremap <leader>c :PrependComment<CR>
   augroup END
 endif
 
