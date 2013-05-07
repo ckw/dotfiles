@@ -169,10 +169,10 @@ nnoremap <leader>gk :GitGutterPrevHunk<CR>
 nnoremap <leader>gb :Gblame<CR>
 nnoremap <leader>gs :Gstatus<CR>
 nnoremap <leader>gd :Gdiff<CR>
-nnoremap <leader>gm :h fugitive<CR>
+nnoremap <leader>gh :h fugitive<CR>
+nnoremap <leader>gl :Glog<CR>:copen<CR>
 ":::::::::::::::::::::::::::::::::::::::::::::::;::::::::::::::::::::::::::::::
 "
-nnoremap <leader>dg :GundoToggle<CR>
 nnoremap <leader>y :YRShow<CR>
 noremap , "
 noremap ; q:i
@@ -190,6 +190,8 @@ onoremap H 0
 nnoremap <left> <esc>:bp<cr>
 nnoremap <right> <esc>:bn<cr>
 
+nnoremap <leader>dg :GundoToggle<CR>
+nnoremap <leader>dq :copen<CR>
 noremap <leader>dd <C-^>
 noremap <leader>da q:inorm ==j0<cr>
 noremap <leader>dr :set relativenumber! relativenumber?<cr>
