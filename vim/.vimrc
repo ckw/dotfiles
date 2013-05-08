@@ -157,7 +157,6 @@ nnoremap <leader>r q:is/
 nnoremap <leader>R q:i% s/
 nnoremap <silent> <leader>t :call RotateColorTheme()<CR>
 nnoremap <leader>ev :split $MYVIMRC<cr>
-nnoremap <leader>dsv :source $MYVIMRC<cr>
 
 vnoremap <tab> %
 vnoremap / /\v
@@ -197,6 +196,9 @@ noremap <leader>de :e<CR>
 noremap <leader>dE :bufdo! e<CR>
 noremap <leader>da q:inorm ==j0<cr>
 noremap <leader>dr :set relativenumber! relativenumber?<cr>
+
+nnoremap <leader>dsv :source $MYVIMRC<cr>
+nnoremap <leader>dso :syn on<CR>
 
 nnoremap <leader>h <C-w>h
 nnoremap <leader>j <C-w>j
