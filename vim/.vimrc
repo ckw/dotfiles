@@ -193,7 +193,7 @@ nnoremap <leader>dg :GundoToggle<CR>
 nnoremap <leader>dq :copen<CR>
 noremap <leader>dd <C-^>
 noremap <leader>de :e<CR>
-noremap <leader>dE :bufdo! e<CR>
+noremap <leader>dE :bufdo! e!<CR>
 noremap <leader>da q:inorm ==j0<cr>
 noremap <leader>dr :set relativenumber! relativenumber?<cr>
 
