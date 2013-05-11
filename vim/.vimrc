@@ -84,11 +84,11 @@ if has("autocmd")
     autocmd FileType haskell com! PrependComment exec "norm! mq0i--\<Esc>`qll"
     autocmd FileType haskell nnoremap <leader>c :PrependComment<CR>
 
-    autocmd FileType rust,*.rs com! PrependComment exec "norm! mq0i//\<Esc>`qll"
-    autocmd FileType rust,*.rs nnoremap <leader>c :PrependComment<CR>
-
     autocmd FileType vim com! PrependComment exec "norm! mq0i\"\<Esc>`ql"
     autocmd FileType vim nnoremap <leader>c :PrependComment<CR>
+
+    autocmd FileType cpp,javascript,rust com! PrependComment exec "norm! mq0i//\<Esc>`qll"
+    autocmd FileType cpp,javascript,rust nnoremap <leader>c :PrependComment<CR>
   augroup END
 endif
 
