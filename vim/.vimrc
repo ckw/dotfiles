@@ -205,6 +205,7 @@ noremap <leader>dr :set relativenumber! relativenumber?<cr>
 
 nnoremap <leader>dsv :source $MYVIMRC<cr>
 nnoremap <leader>dso :syn on<CR>
+nnoremap <leader>dsd :Scratch<CR>
 
 nnoremap <leader>h <C-w>h
 nnoremap <leader>j <C-w>j
