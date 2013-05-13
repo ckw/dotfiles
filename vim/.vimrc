@@ -207,6 +207,8 @@ nnoremap <leader>dsv :source $MYVIMRC<cr>
 nnoremap <leader>dso :syn on<CR>
 nnoremap <leader>dsd :Scratch<CR>
 
+"execute the contents of the current line
+nnoremap <leader>dx :exec 'r! ' . getline('.')<CR>o
 nnoremap <leader>h <C-w>h
 nnoremap <leader>j <C-w>j
 nnoremap <leader>k <C-w>k
