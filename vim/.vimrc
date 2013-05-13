@@ -206,6 +206,7 @@ noremap <leader>dr :set relativenumber! relativenumber?<cr>
 nnoremap <leader>dsv :source $MYVIMRC<cr>
 nnoremap <leader>dso :syn on<CR>
 nnoremap <leader>dsd :Scratch<CR>
+nnoremap <leader>dsc ggdG
 
 "execute the contents of the current line
 nnoremap <leader>dx :exec 'r! ' . getline('.')<CR>o
