@@ -7,7 +7,7 @@ endif
 
 set encoding=utf-8
 
-let g:EasyMotion_leader_key = '<Leader>f'
+"let g:EasyMotion_leader_key = '<Leader>f'
 let g:EasyMotion_keys = 'asdfjkl;eirughwptyo'
 let g:LustyJugglerDefaultMappings = 1
 
@@ -178,7 +178,7 @@ nnoremap <leader>gh :h fugitive<CR>
 nnoremap <leader>gl :Glog<CR>:copen<CR>
 ":::::::::::::::::::::::::::::::::::::::::::::::;::::::::::::::::::::::::::::::
 "
-nnoremap <leader>y :YRShow<CR>
+nnoremap <leader>y :Yanks<CR>
 noremap , "
 noremap ; q:i
 nnoremap / q/i\v
@@ -217,6 +217,10 @@ nnoremap <leader>l <C-w>l
 nnoremap <leader>v <C-w>v
 nnoremap <leader>s <C-w>s
 nnoremap <leader>q :q<cr>
+
+nmap <leader>a <Plug>yankstack_substitute_older_paste
+nmap <leader>fa <Plug>yankstack_substitute_newer_paste
+
 nnoremap <CR> @:
 nnoremap <C-b> <esc>:buffers<cr>
 nnoremap n nzz
