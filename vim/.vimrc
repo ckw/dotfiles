@@ -218,8 +218,8 @@ nnoremap <leader>v <C-w>v
 nnoremap <leader>s <C-w>s
 nnoremap <leader>q :q<cr>
 
-nmap <leader>a <Plug>yankstack_substitute_older_paste
-nmap <leader>fa <Plug>yankstack_substitute_newer_paste
+nmap <leader>fd <Plug>yankstack_substitute_older_paste
+nmap <leader>fs <Plug>yankstack_substitute_newer_paste
 
 nnoremap <CR> @:
 nnoremap <C-b> <esc>:buffers<cr>
