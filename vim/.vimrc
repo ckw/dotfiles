@@ -218,9 +218,16 @@ nnoremap <leader>v <C-w>v
 nnoremap <leader>s <C-w>s
 nnoremap <leader>q :q<cr>
 
+
 nmap <leader>fd <Plug>yankstack_substitute_older_paste
 nmap <leader>fs <Plug>yankstack_substitute_newer_paste
 
+""""""""""""""""""""""unicode character mappings"""""""""""""""""""""""""""""
+nnoremap <leader>ual iλ<esc>
+nnoremap <leader>ua> i→<esc>
+nnoremap <leader>ua< i←<esc>
+nnoremap <leader>ua. i·<esc>
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <CR> @:
 nnoremap <C-b> <esc>:buffers<cr>
 nnoremap n nzz
