@@ -159,7 +159,9 @@ nnoremap % v%
 nnoremap <tab> v%
 nnoremap <leader>; ,
 nnoremap <leader>n q:inorm<space>
-nnoremap <leader>r q:is/
+
+"send to blackhole
+nnoremap <leader>r "_d
 nnoremap <leader>R q:i% s/
 nnoremap <silent> <leader>t :call RotateColorTheme()<CR>
 nnoremap <leader>ev :split $MYVIMRC<cr>
