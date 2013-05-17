@@ -16,11 +16,13 @@ colors
 setopt prompt_subst
 set -o vi
 #bindkey -v
-HISTSIZE=10000
 SAVEHIST=10000
+HISTSIZE=10000
 HISTFILE=~/.zsh_history
 setopt HIST_IGNORE_DUPS
 setopt HIST_FIND_NO_DUPS
+setopt inc_append_history
+setopt share_history
 setopt auto_cd
 setopt auto_pushd
 bindkey '^R' history-incremental-search-backward
