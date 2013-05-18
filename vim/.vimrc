@@ -225,10 +225,13 @@ nmap <leader>fd <Plug>yankstack_substitute_older_paste
 nmap <leader>fs <Plug>yankstack_substitute_newer_paste
 
 """"""""""""""""""""""unicode character mappings"""""""""""""""""""""""""""""
-nnoremap <leader>ual iλ<esc>
-nnoremap <leader>ua> i→<esc>
-nnoremap <leader>ua< i←<esc>
-nnoremap <leader>ua. i·<esc>
+nnoremap <leader>uaa aλ<esc>
+nnoremap <leader>ual a→<esc>
+nnoremap <leader>uah a←<esc>
+nnoremap <leader>ua. a∘<esc>
+nnoremap <leader>uaA a∀<esc>
+nnoremap <leader>ua> a⇒<esc>
+nnoremap <leader>ua; a∷<esc>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <CR> @:
 nnoremap <C-b> <esc>:buffers<cr>
