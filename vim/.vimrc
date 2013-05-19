@@ -147,28 +147,31 @@ nnoremap ` '
 nnoremap <silent> zj o<Esc>0d$k
 nnoremap <silent> zk O<Esc>0d$j
 nnoremap <silent> zjk O<Esc>0d$jo<Esc>0d$k
-nnoremap <leader>p ]p
 
 " Pull word under cursor into LHS of a substitute (for quick search and
 " " replace)
-nnoremap <leader>z :%s#\<<C-r>=expand("<cword>")<CR>\>#
 
 noremap <F4> :set hlsearch! <CR>
 nnoremap / /\v
 nnoremap % v%
 nnoremap <tab> v%
-nnoremap <leader>; ,
-nnoremap <leader>n q:inorm<space>
 
-"send to blackhole
-nnoremap <leader>r "_d
-nnoremap <leader>R q:i% s/
-nnoremap <silent> <leader>t :call RotateColorTheme()<CR>
-nnoremap <leader>ev :split $MYVIMRC<cr>
+
+noremap , "
+noremap ; q:i
+nnoremap / q/i\v
+nnoremap ? q?i
+
+noremap L $
+noremap H 0
+onoremap L $
+onoremap H 0
+
+nnoremap <left> <esc>:bp<cr>
+nnoremap <right> <esc>:bn<cr>
 
 vnoremap <tab> %
 vnoremap / /\v
-vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
 
 "::::::::::::::::::::::::::::::::::::GIT::::::::;::::::::::::::::::::::::::::::
 nnoremap <leader>gj :GitGutterNextHunk<CR>
@@ -179,23 +182,6 @@ nnoremap <leader>gd :Gdiff<CR>
 nnoremap <leader>gh :h fugitive<CR>
 nnoremap <leader>gl :Glog<CR>:copen<CR>
 ":::::::::::::::::::::::::::::::::::::::::::::::;::::::::::::::::::::::::::::::
-"
-nnoremap <leader>y :Yanks<CR>
-noremap , "
-noremap ; q:i
-nnoremap / q/i\v
-nnoremap ? q?i
-
-
-nnoremap <leader>a :Ack<Space><c-r><c-W><CR>
-
-noremap L $
-noremap H 0
-onoremap L $
-onoremap H 0
-
-nnoremap <left> <esc>:bp<cr>
-nnoremap <right> <esc>:bn<cr>
 
 nnoremap <leader>dg :GundoToggle<CR>
 nnoremap <leader>dq :copen<CR>
@@ -204,14 +190,16 @@ noremap <leader>de :e<CR>
 noremap <leader>dE :bufdo! e!<CR>
 noremap <leader>da q:inorm ==j0<cr>
 noremap <leader>dr :set relativenumber! relativenumber?<cr>
-
+"execute the contents of the current line
+nnoremap <leader>dx :exec 'r! ' . getline('.')<CR>o
 nnoremap <leader>dsv :source $MYVIMRC<cr>
 nnoremap <leader>dso :syn on<CR>
 nnoremap <leader>dsd :Scratch<CR>
 nnoremap <leader>dsc ggdG
 
-"execute the contents of the current line
-nnoremap <leader>dx :exec 'r! ' . getline('.')<CR>o
+nmap <leader>fd <Plug>yankstack_substitute_older_paste
+nmap <leader>fs <Plug>yankstack_substitute_newer_paste
+
 nnoremap <leader>h <C-w>h
 nnoremap <leader>j <C-w>j
 nnoremap <leader>k <C-w>k
@@ -219,10 +207,19 @@ nnoremap <leader>l <C-w>l
 nnoremap <leader>v <C-w>v
 nnoremap <leader>s <C-w>s
 nnoremap <leader>q :q<cr>
-
-
-nmap <leader>fd <Plug>yankstack_substitute_older_paste
-nmap <leader>fs <Plug>yankstack_substitute_newer_paste
+nnoremap <leader>w :w<CR>
+"send to blackhole
+nnoremap <leader>r "_d
+nnoremap <leader>n q:inorm<space>
+nnoremap <leader>z :%s#\<<C-r>=expand("<cword>")<CR>\>#
+nnoremap <leader>R q:i% s/
+vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
+nnoremap <leader>; ,
+nnoremap <silent> <leader>t :call RotateColorTheme()<CR>
+nnoremap <leader>ev :split $MYVIMRC<cr>
+nnoremap <leader>p ]p
+nnoremap <leader>y :Yanks<CR>
+nnoremap <leader>a :Ack<Space><c-r><c-W><CR>
 
 """"""""""""""""""""""unicode character mappings"""""""""""""""""""""""""""""
 nnoremap <leader>uaa aλ<esc>
@@ -251,8 +248,6 @@ vnoremap k gk
 vnoremap <C-j> 15j
 vnoremap <C-k> 15k
 nnoremap f <esc>:call FindAllChars()<cr>
-
-nnoremap <leader>w :w<CR>
 
 ":::::::::::::::::::::::::::::::::::::::::::::::;::::::::::::::::::::::::::::::
 let g:Powerline_symbols = 'fancy'
