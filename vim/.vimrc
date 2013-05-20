@@ -162,10 +162,12 @@ noremap ; q:i
 nnoremap / q/i\v
 nnoremap ? q?i
 
-noremap L $
-noremap H 0
-onoremap L $
-onoremap H 0
+noremap <C-l> $
+noremap <C-h> 0
+onoremap <C-l> $
+onoremap <C-h> 0
+nnoremap I gI
+nnoremap gI I
 
 nnoremap <left> <esc>:bp<cr>
 nnoremap <right> <esc>:bn<cr>
