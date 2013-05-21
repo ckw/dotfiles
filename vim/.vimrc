@@ -11,29 +11,6 @@ let g:EasyMotion_leader_key = '<Leader>_'
 let g:EasyMotion_keys = 'asdfjkl;eirughwptyo'
 let g:LustyJugglerDefaultMappings = 1
 
-":::::::::::::::::::::::::Theme Rotating:::::::::::::::::::::::::::::::::::::::
-
-let themeindex = 0
-let c_schemes = ["inkpot",
-      \ "slate",
-      \ "ron",
-      \ "blue",
-      \ "elflord",
-      \ "evening",
-      \ "koehler",
-      \ "murphy",
-      \ "pablo",
-      \ "desert",
-      \ "torte",
-      \ "vibrantink",
-      \ "metacosm",
-      \ "jellybeans",
-      \ "wombat",
-      \ "zenburn",
-      \ ]
-
-
-"::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 call pathogen#infect()
@@ -440,9 +417,32 @@ function! FindAllChars()
   set scrolloff=5
 endfunction
 
+":::::::::::::::::::::::::Theme Rotating:::::::::::::::::::::::::::::::::::::::
+let themeindex = 0
+let c_schemes = ["inkpot",
+      \ "slate",
+      \ "ron",
+      \ "blue",
+      \ "elflord",
+      \ "evening",
+      \ "koehler",
+      \ "murphy",
+      \ "pablo",
+      \ "desert",
+      \ "torte",
+      \ "vibrantink",
+      \ "metacosm",
+      \ "jellybeans",
+      \ "wombat",
+      \ "zenburn",
+      \ ]
+
+
+
 function! RotateColorTheme()
   let g:themeindex = (g:themeindex + 1) % len(g:c_schemes)
   let newtheme = g:c_schemes[g:themeindex]
   execute ":colorscheme ".newtheme
   hi CursorLine term=none cterm=none ctermbg=4
 endfunction
+"::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
