@@ -1,10 +1,3 @@
-# DESCRIPTION:
-#   A simple zsh configuration that gives you 90% of the useful features that I use everyday.
-#
-# AUTHOR:
-#   Geoffrey Grosenbach http://peepcode.com
-
-
 # RVM
 if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi
 
@@ -74,6 +67,7 @@ alias gap='git add -p'
 alias gpr='git pull --rebase'
 alias gm='git merge'
 alias gmnoff='git merge --no-ff'
+alias ga='git add'
 alias gff='git pull --ff-only'
 alias gf='git fetch'
 alias gp='git push'
@@ -83,6 +77,8 @@ alias zk='/usr/share/zookeeper/bin/zkCli.sh'
 alias v='vim'
 alias c='cat'
 alias e='echo'
+
+alias pag='ps aux | ag'
 
   function zle-line-finish {
    vim_mode=$vim_ins_mode
