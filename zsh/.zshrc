@@ -71,6 +71,7 @@ alias ga='git add'
 alias gff='git pull --ff-only'
 alias gf='git fetch'
 alias gp='git push'
+alias gr='git reset'
 alias gco='git checkout'
 
 alias zk='/usr/share/zookeeper/bin/zkCli.sh'
