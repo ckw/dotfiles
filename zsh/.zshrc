@@ -79,6 +79,7 @@ alias zk='/usr/share/zookeeper/bin/zkCli.sh'
 alias v='vim'
 alias c='cat'
 alias e='echo'
+alias t='tig'
 
 alias pag='ps aux | ag'
 
