@@ -125,14 +125,10 @@ nnoremap <silent> zj o<Esc>0d$k
 nnoremap <silent> zk O<Esc>0d$j
 nnoremap <silent> zjk O<Esc>0d$jo<Esc>0d$k
 
-" Pull word under cursor into LHS of a substitute (for quick search and
-" " replace)
-
 noremap <F4> :set hlsearch! <CR>
 nnoremap / /\v
 nnoremap % v%
 nnoremap <tab> v%
-
 
 noremap , "
 noremap ; q:i
@@ -169,6 +165,7 @@ noremap <leader>de :e<CR>
 noremap <leader>dE :bufdo! e!<CR>
 noremap <leader>da q:inorm ==j0<cr>
 noremap <leader>dr :set relativenumber! relativenumber?<cr>
+
 "execute the contents of the current line
 nnoremap <leader>dx :exec 'r! ' . getline('.')<CR>o
 nnoremap <leader>dsv :source $MYVIMRC<cr>
@@ -187,9 +184,12 @@ nnoremap <leader>v <C-w>v
 nnoremap <leader>s <C-w>s
 nnoremap <leader>q :q<cr>
 nnoremap <leader>w :w<CR>
+
 "send to blackhole
 nnoremap <leader>r "_d
 nnoremap <leader>n q:inorm<space>
+
+" Pull word under cursor into LHS of a substitute (for quick search and replace)
 nnoremap <leader>z :%s#\<<C-r>=expand("<cword>")<CR>\>#
 nnoremap <leader>R q:i% s/
 vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
