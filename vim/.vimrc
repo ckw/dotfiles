@@ -173,9 +173,6 @@ nnoremap <leader>dso :syn on<CR>
 nnoremap <leader>dsd :Scratch<CR>
 nnoremap <leader>dsc ggdG
 
-nmap <leader>fd <Plug>yankstack_substitute_older_paste
-nmap <leader>fs <Plug>yankstack_substitute_newer_paste
-
 nnoremap <leader>h <C-w>h
 nnoremap <leader>j <C-w>j
 nnoremap <leader>k <C-w>k
@@ -197,7 +194,6 @@ nnoremap <leader>; ,
 nnoremap <silent> <leader>t :call RotateColorTheme()<CR>
 nnoremap <leader>ev :split $MYVIMRC<cr>
 nnoremap <leader>p ]p
-nnoremap <leader>y :Yanks<CR>
 nnoremap <leader>a :Ack<Space><c-r><c-W><CR>
 
 """"""""""""""""""""""unicode character mappings"""""""""""""""""""""""""""""

@@ -20,7 +20,6 @@ git clone https://github.com/Shougo/neocomplcache
 git clone https://github.com/kien/ctrlp.vim
 git clone https://github.com/airblade/vim-gitgutter.git
 git clone https://github.com/duff/vim-scratch.git
-git clone https://github.com/maxbrunsfeld/vim-yankstack.git
 
 git clone https://github.com/flazz/vim-colorschemes.git ~/.vim/vim-colorschemes
 ln -s ~/.vim/vim-colorschemes/colors ~/.vim/colors
