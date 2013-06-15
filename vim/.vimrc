@@ -173,6 +173,8 @@ nnoremap <leader>dso :syn on<CR>
 nnoremap <leader>dsd :Scratch<CR>
 nnoremap <leader>dsc ggdG
 
+nnoremap <leader>f "
+
 nnoremap <leader>h <C-w>h
 nnoremap <leader>j <C-w>j
 nnoremap <leader>k <C-w>k
@@ -182,7 +184,7 @@ nnoremap <leader>s <C-w>s
 nnoremap <leader>q :q<cr>
 nnoremap <leader>w :w<CR>
 
-"send to blackhole
+"send to blackhole register
 nnoremap <leader>r "_d
 nnoremap <leader>n q:inorm<space>
 
