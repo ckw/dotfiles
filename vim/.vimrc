@@ -163,6 +163,7 @@ nnoremap <leader>gl :Glog<CR>:copen<CR>
 
 nnoremap <leader>dg :GundoToggle<CR>
 nnoremap <leader>dq :copen<CR>
+nnoremap <leader>dC :CtrlPClearAllCaches<CR>
 noremap <leader>dd <C-^>
 noremap <leader>de :e<CR>
 noremap <leader>dE :bufdo! e!<CR>
