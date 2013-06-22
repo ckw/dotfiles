@@ -96,6 +96,11 @@ function zle-keymap-select {
   zle reset-prompt
 }
 
+
+function gsw() {
+  git checkout $(git branch | ag $1)
+}
+
 zle -N zle-keymap-select
 zle -N zle-line-finish
 
