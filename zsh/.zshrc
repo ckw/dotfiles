@@ -76,6 +76,7 @@ alias gp='git push'
 alias gr='git reset'
 alias gco='git checkout'
 alias gri='git rebase -i'
+alias gb='git branch'
 
 alias zk='/usr/share/zookeeper/bin/zkCli.sh'
 alias v='vim'
