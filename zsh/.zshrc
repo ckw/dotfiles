@@ -85,6 +85,7 @@ alias v='vim'
 alias c='cat'
 alias e='echo'
 alias t='tig'
+alias s='ssh'
 alias -g wl='| wc -l'
 
 alias pag='ps aux | ag'
