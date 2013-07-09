@@ -91,9 +91,8 @@ alias -g wl='| wc -l'
 
 alias pag='ps aux | ag'
 
-  function zle-line-finish {
-   vim_mode=$vim_ins_mode
-#    zle reset-prompt
+function zle-line-finish {
+  vim_mode=$vim_ins_mode
 }
 
 function zle-keymap-select {
@@ -103,7 +102,12 @@ function zle-keymap-select {
 
 
 function gsw() {
-  git checkout $(git branch | ag $1)
+  git checkout $(git branch | ack-grep $1)
+}
+
+#haskell type
+function ht(){
+  ack-grep -A 5 -i "data $1|type $1|newtype $1|$1.*::"
 }
 
 zle -N zle-keymap-select
