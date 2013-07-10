@@ -107,7 +107,13 @@ function gsw() {
 
 #haskell type
 function ht(){
-  ack-grep -A 5 -i "data $1|type $1|newtype $1|$1.*::"
+if [[ $2 -eq 'd' ]]; then
+  ack-grep -A 5 -i "data .*$1.*"
+elif [[ $2 -eq 'f' ]]; then
+  ack-grep -A 5 -i ".*$1.*::"
+else
+  ack-grep -A 5 -i "data .*$1.*|type $1|newtype $1|$1.*::"
+fi
 }
 
 zle -N zle-keymap-select
