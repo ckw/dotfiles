@@ -31,6 +31,7 @@ set t_Co=256
 
 ":::::::::::::::::::::::::::::::::::::::autocommands::::::::::::::::::::::::::
 
+filetype plugin indent on
 if has("autocmd")
   augroup augs
     autocmd!
@@ -58,8 +59,9 @@ if has("autocmd")
     autocmd FileType ruby com! PrependComment exec "norm! mq0i#\<Esc>`ql"
     autocmd FileType ruby nnoremap <leader>c :PrependComment<CR>
 
-    autocmd FileType haskell com! PrependComment exec "norm! mq0i--\<Esc>`qll"
-    autocmd FileType haskell nnoremap <leader>c :PrependComment<CR>
+    autocmd FileType haskell,*.hs com! PrependComment exec "norm! mq0i--\<Esc>`qll"
+    autocmd FileType haskell,*.hs nnoremap <leader>c :PrependComment<CR>
+    autocmd FileType haskell,*.hs set makeprg=coup\ build
 
     autocmd FileType vim com! PrependComment exec "norm! mq0i\"\<Esc>`ql"
     autocmd FileType vim nnoremap <leader>c :PrependComment<CR>
