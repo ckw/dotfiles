@@ -108,11 +108,11 @@ function gsw() {
 #haskell type
 function ht(){
 if [[ $2 == 't' ]]; then
-  ack-grep -A 5 -i "\Adata .*$1.*|\Atype .*$1.*|\Anewtype .*$1.*"
+  ack-grep -A 5 -i "data \w*$1\w* .*|type \w*$1\w* .*|newtype \w*$1\w* .*"
 elif [[ $2 == 'f' ]]; then
-  ack-grep -A 5 -i ".*$1.*::"
+  ack-grep -A 5 -i "\w*$1\w* ::"
 else
-  ack-grep -A 5 -i "\Adata .*$1.*|\Atype .*$1.*|\Anewtype .*$1.*|$1.*::"
+  ack-grep -A 5 -i "data \w*$1\w* .*|type \w*$1\w* .*|newtype \w*$1\w* .* |\w*$1\w* ::"
 fi
 }
 
