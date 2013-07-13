@@ -12,7 +12,6 @@ let g:EasyMotion_keys = 'asdfjkl;eirughwptyo'
 let g:LustyJugglerDefaultMappings = 1
 
 
-
 call pathogen#infect()
 
 set fillchars+=stl:\ ,stlnc:\
@@ -26,8 +25,6 @@ endtry
 
 
 set t_Co=256
-"set term=screen-256color
-"
 
 ":::::::::::::::::::::::::::::::::::::::autocommands::::::::::::::::::::::::::
 
@@ -96,7 +93,6 @@ set textwidth=79
 set formatoptions=qrn1
 set gdefault
 set incsearch
-"set hlsearch
 set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%)
 set undolevels=2000
 set ttyfast
@@ -108,7 +104,6 @@ set synmaxcol=2048      " Syntax coloring too-long lines is slow
 
 "set hidden             " Hide buffers when they are abandoned
 set colorcolumn=85
-"set relativenumber
 set undofile
 set lazyredraw
 set noswapfile
