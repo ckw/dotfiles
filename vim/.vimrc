@@ -63,8 +63,8 @@ if has("autocmd")
     autocmd FileType vim com! PrependComment exec "norm! mq0i\"\<Esc>`ql"
     autocmd FileType vim nnoremap <leader>c :PrependComment<CR>
 
-    autocmd FileType cpp,javascript,rust com! PrependComment exec "norm! mq0i//\<Esc>`qll"
-    autocmd FileType cpp,javascript,rust nnoremap <leader>c :PrependComment<CR>
+    autocmd FileType cpp,javascript,*.js,rust,*.rs com! PrependComment exec "norm! mq0i//\<Esc>`qll"
+    autocmd FileType cpp,javascript,*.js,rust,*.rs nnoremap <leader>c :PrependComment<CR>
   augroup END
 endif
 
@@ -101,8 +101,6 @@ set softtabstop=2
 set expandtab
 set ls=2
 set synmaxcol=2048      " Syntax coloring too-long lines is slow
-
-"set hidden             " Hide buffers when they are abandoned
 set colorcolumn=85
 set undofile
 set lazyredraw
