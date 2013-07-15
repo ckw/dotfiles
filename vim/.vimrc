@@ -105,6 +105,7 @@ set colorcolumn=85
 set undofile
 set lazyredraw
 set noswapfile
+set timeoutlen=500
 
 let undodir = "/home/ckw/undo_dir_vim"
 
