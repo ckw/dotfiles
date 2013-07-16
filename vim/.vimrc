@@ -10,7 +10,7 @@ set encoding=utf-8
 let g:EasyMotion_leader_key = '<Leader>_'
 let g:EasyMotion_keys = 'asdfjkl;eirughwptyo'
 let g:LustyJugglerDefaultMappings = 1
-
+let g:leader_prime = 's'
 
 call pathogen#infect()
 
@@ -240,7 +240,7 @@ let g:gundo_width = 45
 "
 ":::::::::::::::::::::::::CTRLP::::::::::::::::::::::::::::::::::::::::::::::::
 "Use this option to change the mapping to invoke CtrlP in |Normal| mode: >
-let g:ctrlp_map = '<c-p>'
+let g:ctrlp_map = g:leader_prime . 's'
 
 "Set the default opening command to use when pressing the above mapping: >
 let g:ctrlp_cmd = 'CtrlPMixed'
