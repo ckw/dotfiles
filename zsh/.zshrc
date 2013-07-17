@@ -1,6 +1,7 @@
 # RVM
 if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi
 
+source /usr/share/autojump/autojump.sh
 export TERM=xterm-256color
 export PATH=/opt/ghc-7.4.2/bin:$PATH
 # Colors
@@ -121,6 +122,4 @@ zle -N zle-line-finish
 
 
 # Load completions for Ruby, Git, etc.
-autoload compinit
-compinit
-
+autoload -U compinit && compinit -u
