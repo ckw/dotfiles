@@ -88,6 +88,7 @@ alias e='echo'
 alias t='tig'
 alias s='ssh'
 alias h='htop'
+alias k='kill'
 alias -g wl='| wc -l'
 
 alias pag='ps aux | ag'
