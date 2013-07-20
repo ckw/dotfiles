@@ -91,7 +91,7 @@ alias h='htop'
 alias k='kill'
 alias -g wl='| wc -l'
 
-alias pag='ps aux | ag'
+alias pag='ps aux | ag -i'
 
 function zle-line-finish {
   vim_mode=$vim_ins_mode
