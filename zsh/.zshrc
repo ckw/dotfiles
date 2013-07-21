@@ -51,6 +51,7 @@ alias la='ls -lAh'
 alias l='ls -lFhA'
 alias ag='ack-grep'
 alias red='redis-cli'
+alias reds='redis-server'
 
 alias P='pushd'
 alias p='popd'
