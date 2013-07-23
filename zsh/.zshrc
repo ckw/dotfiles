@@ -52,6 +52,7 @@ alias l='ls -lFhA'
 alias ag='ack-grep'
 alias red='redis-cli'
 alias reds='redis-server'
+alias sagi='sudo apt-get install'
 
 alias P='pushd'
 alias p='popd'
