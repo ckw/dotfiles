@@ -45,6 +45,11 @@ if has("autocmd")
     autocmd CmdwinLeave * :nnoremap <CR> @:
     autocmd BufWinEnter quickfix nnoremap <buffer> <cr> :.cc<cr>:wincmd p<cr>
     autocmd BufNewFile,BufRead *.json :set ft=json
+    autocmd BufNewFile,BufRead *.hs :set ft=haskell
+    autocmd BufNewFile,BufRead *.rb :set ft=ruby
+    autocmd BufNewFile,BufRead *.js :set ft=javascript
+    autocmd BufNewFile,BufRead *.rs :set ft=rust
+    autocmd BufNewFile,BufRead .vimrc :set ft=vim
 
     " Enable neocomplcache omni completion.
     autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
@@ -56,15 +61,15 @@ if has("autocmd")
     autocmd FileType ruby com! PrependComment exec "norm! mq0i#\<Esc>`ql"
     autocmd FileType ruby nnoremap <leader>c :PrependComment<CR>
 
-    autocmd FileType haskell,*.hs com! PrependComment exec "norm! mq0i--\<Esc>`qll"
-    autocmd FileType haskell,*.hs nnoremap <leader>c :PrependComment<CR>
-    autocmd FileType haskell,*.hs set makeprg=coup\ build
+    autocmd FileType haskell com! PrependComment exec "norm! mq0i--\<Esc>`qll"
+    autocmd FileType haskell nnoremap <leader>c :PrependComment<CR>
+    autocmd FileType haskell set makeprg=coup\ build
 
     autocmd FileType vim com! PrependComment exec "norm! mq0i\"\<Esc>`ql"
     autocmd FileType vim nnoremap <leader>c :PrependComment<CR>
 
-    autocmd FileType cpp,javascript,*.js,rust,*.rs com! PrependComment exec "norm! mq0i//\<Esc>`qll"
-    autocmd FileType cpp,javascript,*.js,rust,*.rs nnoremap <leader>c :PrependComment<CR>
+    autocmd FileType cpp,javascript,rust com! PrependComment exec "norm! mq0i//\<Esc>`qll"
+    autocmd FileType cpp,javascript,rust nnoremap <leader>c :PrependComment<CR>
   augroup END
 endif
 
