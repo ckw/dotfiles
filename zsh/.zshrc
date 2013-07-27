@@ -108,7 +108,14 @@ function zle-keymap-select {
 
 
 function gsw() {
-  git checkout $(git branch | ack-grep $1)
+  res=$(git branch | ack-grep $1 | cut -d ' ' -f 3 | sed '/^$/d')
+  count=$(echo $res | wc -l)
+
+  if [[ $count == '1' ]]; then
+    git checkout $res
+  else
+    echo $res
+  fi
 }
 
 #haskell type
