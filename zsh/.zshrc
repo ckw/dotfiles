@@ -108,11 +108,27 @@ function zle-keymap-select {
 
 
 function gsw() {
-  res=$(git branch | ack-grep $1 | cut -d ' ' -f 3 | sed '/^$/d')
+  res=$(git branch | grep $1 | cut -d ' ' -f 3 | sed '/^$/d')
   count=$(echo $res | wc -l)
+
+  if [[ $res == '' ]]; then
+    count='0'
+  fi
 
   if [[ $count == '1' ]]; then
     git checkout $res
+
+  elif [[ $count == '0' ]]; then
+    res_r=$(git branch -r | grep $1 | cut -d ' ' -f 3 | sed '/^$/d')
+    count=$(echo $res_r | wc -l)
+
+    if [[ $count == '1' ]]; then
+      git checkout $(echo $res_r | sed 's/^origin\///')
+
+    else
+      echo $res_r
+    fi
+
   else
     echo $res
   fi
