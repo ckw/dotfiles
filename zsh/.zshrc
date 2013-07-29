@@ -23,7 +23,7 @@ bindkey '^R' history-incremental-search-backward
 bindkey -M viins 'jk' vi-cmd-mode
 
 # Prompt
-local smiley="%(?,%{$fg[green]%}☺%{$reset_color%},%{$fg[red]%}☹%{$reset_color%})"
+local lambda="%(?,%{$fg[green]%}λ%{$reset_color%},%{$fg[red]%}λ%{$reset_color%})"
 
 vim_ins_mode="%{$fg[cyan]%}[I]%{$reset_color%}"
 vim_cmd_mode="%{$fg[yellow]%}[N]%{$reset_color%}"
@@ -31,11 +31,8 @@ vim_mode=$vim_ins_mode
 
 PROMPT='
 %~
-${smiley} %{$reset_color%}${vim_mode} '
+${lambda}%{$reset_color%}${vim_mode} '
 RPROMPT='%{$fg[white]%} $(~/zsh/bin/git-cwd-info)%{$reset_color%}'
-
-# Replace the above with this if you use rbenv
-# RPROMPT='%{$fg[white]%} $(~/.rbenv/bin/rbenv version-name)$(~/bin/git-cwd-info.rb)%{$reset_color%}'
 
 # Show completion on first TAB
 setopt menucomplete
