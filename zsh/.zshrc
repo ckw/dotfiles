@@ -136,9 +136,9 @@ function ht(){
 if [[ $2 == 't' ]]; then
   ack-grep -A 5 -i "data \w*$1\w* .*|type \w*$1\w* .*|newtype \w*$1\w* .*"
 elif [[ $2 == 'f' ]]; then
-  ack-grep -A 5 -i "\w*$1\w* ::"
+  ack-grep -A 5 -i "[\w']*$1[\w']* ::"
 else
-  ack-grep -A 5 -i "data \w*$1\w* .*|type \w*$1\w* .*|newtype \w*$1\w* .* |\w*$1\w* ::"
+  ack-grep -A 5 -i "data \w*$1\w* .*|type \w*$1\w* .*|newtype \w*$1\w* .* |[\w']*$1[\w']* ::"
 fi
 }
 
