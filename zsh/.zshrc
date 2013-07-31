@@ -84,7 +84,7 @@ alias gb='git branch'
 
 alias zk='/usr/share/zookeeper/bin/zkCli.sh'
 alias v='vim'
-alias c='cat'
+alias c='coup'
 alias e='echo'
 alias t='tig'
 alias s='ssh'
