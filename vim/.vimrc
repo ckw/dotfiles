@@ -116,7 +116,9 @@ let undodir = "/home/ckw/undo_dir_vim"
 
 ":::::::::::::::::::::::::::::::::::::::mapping:::::::::::::::::::::::::::::::
 let mapleader=" "
+
 inoremap jk  <ESC>
+inoremap df  <ESC>
 
 nnoremap ' `
 nnoremap ` '
