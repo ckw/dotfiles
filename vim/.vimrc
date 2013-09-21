@@ -203,7 +203,7 @@ nnoremap <leader>R q:i% s/
 vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
 nnoremap <leader>; ,
 nnoremap <silent> <leader>t :call RotateColorTheme()<CR>
-nnoremap <leader>ev :split $MYVIMRC<cr>
+nnoremap <leader>ev :e $MYVIMRC<cr>
 nnoremap <leader>p ]p
 nnoremap <leader>a :Ack<Space><c-r><c-W><CR>
 
