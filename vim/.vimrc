@@ -173,13 +173,13 @@ noremap <leader>dE :bufdo! e!<CR>
 noremap <leader>da q:inorm ==j0<cr>
 noremap <leader>dr :set relativenumber! relativenumber?<cr>
 
-"execute the contents of the current line
 nnoremap <leader>dsv :source $MYVIMRC<cr>
 nnoremap <leader>dso :syn on<CR>
 nnoremap <leader>dsd :Scratch<CR>
 nnoremap <leader>dsc ggdG
 
 exe "nnoremap " . g:leader_prime . "d :Scratch\<CR>"
+"execute the contents of the current line
 exe "nnoremap " . g:leader_prime . "x :exec 'r! ' . getline('.')\<CR>"
 
 nnoremap <leader>f "
