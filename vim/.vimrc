@@ -9,7 +9,7 @@ set encoding=utf-8
 
 let g:EasyMotion_leader_key = '<Leader>_'
 let g:EasyMotion_keys = 'asdfjkl;eirughwptyo'
-let g:LustyJugglerDefaultMappings = 1
+let g:LustyJugglerDefaultMappings = 0
 let g:leader_prime = 's'
 
 call pathogen#infect()
@@ -167,11 +167,11 @@ nnoremap <leader>gl :Glog<CR>:copen<CR>
 nnoremap <leader>dg :GundoToggle<CR>
 nnoremap <leader>dq :copen<CR>
 nnoremap <leader>dC :CtrlPClearAllCaches<CR>
-noremap <leader>dd <C-^>
-noremap <leader>de :e<CR>
-noremap <leader>dE :bufdo! e!<CR>
-noremap <leader>da q:inorm ==j0<cr>
-noremap <leader>dr :set relativenumber! relativenumber?<cr>
+nnoremap <leader>dd <C-^>
+nnoremap <leader>de :e<CR>
+nnoremap <leader>dE :bufdo! e!<CR>
+nnoremap <leader>da q:inorm ==j0<cr>
+nnoremap <leader>dr :set relativenumber! relativenumber?<cr>
 
 nnoremap <leader>dsv :source $MYVIMRC<cr>
 nnoremap <leader>dso :syn on<CR>
@@ -206,6 +206,7 @@ nnoremap <silent> <leader>t :call RotateColorTheme()<CR>
 nnoremap <leader>ev :e $MYVIMRC<cr>
 nnoremap <leader>p ]p
 nnoremap <leader>a :Ack<Space><c-r><c-W><CR>
+nmap <silent> <Leader><Leader> :LustyJuggler<CR>
 
 """"""""""""""""""""""unicode character mappings"""""""""""""""""""""""""""""
 nnoremap <leader>uaa aλ<esc>
