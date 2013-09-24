@@ -198,9 +198,7 @@ nnoremap <leader>r "_d
 nnoremap <leader>n q:inorm<space>
 
 " Pull word under cursor into LHS of a substitute (for quick search and replace)
-nnoremap <leader>z :%s#\<<C-r>=expand("<cword>")<CR>\>#
-nnoremap <leader>R q:i% s/
-vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
+nnoremap <leader>z :%s/\<<C-r>=expand("<cword>")<CR>\>/
 nnoremap <leader>; ,
 nnoremap <silent> <leader>t :call RotateColorTheme()<CR>
 nnoremap <leader>ev :e $MYVIMRC<cr>
