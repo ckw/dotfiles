@@ -127,9 +127,8 @@ onoremap ' `
 onoremap ` '
 
 " Create Blank Newlines and stay in Normal mode, in same place
-nnoremap <silent> zj o<Esc>0d$k
-nnoremap <silent> zk O<Esc>0d$j
-nnoremap <silent> zjk O<Esc>0d$jo<Esc>0d$k
+nnoremap <silent> <leader>o o<Esc>0d$k
+nnoremap <silent> <leader>O O<Esc>0d$j
 
 noremap <F4> :set hlsearch! <CR>
 nnoremap / /\v
