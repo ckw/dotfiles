@@ -174,8 +174,6 @@ nnoremap <leader>dr :set relativenumber! relativenumber?<cr>
 
 nnoremap <leader>dsv :source $MYVIMRC<cr>
 nnoremap <leader>dso :syn on<CR>
-nnoremap <leader>dsd :Scratch<CR>
-nnoremap <leader>dsc ggdG
 
 exe "nnoremap " . g:leader_prime . "d :Scratch\<CR>"
 "execute the contents of the current line
