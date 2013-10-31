@@ -3,6 +3,10 @@
     email = jricacosta+github@gmail.com
 [core]
     excludesfile = ~/.gitignore
+    safecrlf = true
+    autocrlf = false
+    eol = lf
+    whitespace = trailing-space,space-before-tab
 [push]
     default = tracking
 [alias]
@@ -14,9 +18,7 @@
     br = branch
     b = branch
     ci = commit
-    cia = commit -a
     cim = commit -m
-    ciam = commit -a -m
     co = checkout
     diffi = diff --color-words
     diffw = diff -w
@@ -37,13 +39,6 @@
     ui = true
 [receive]
     denyCurrentBranch = refuse
-[push]
-    default = tracking
 [merge]
     defaultToUpstream = true
     conflictstyle  = diff3
-[core]
-    safecrlf = true
-    autocrlf = false
-    eol = lf
-    whitespace = trailing-space,space-before-tab
