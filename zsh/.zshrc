@@ -32,7 +32,7 @@ vim_mode=$vim_ins_mode
 PROMPT='
 %~
 ${lambda}%{$reset_color%}${vim_mode} '
-RPROMPT='%{$fg[white]%} $(~/zsh/bin/git-cwd-info)%{$reset_color%}'
+RPROMPT='%{$fg[white]%} $(~/zsh-simple/bin/git-cwd-info)%{$reset_color%}'
 
 # Show completion on first TAB
 setopt menucomplete
