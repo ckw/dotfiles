@@ -155,5 +155,7 @@ zle -N zle-line-finish
 autoload -U compinit && compinit -u
 
 echo $SSH_AUTH_SOCK
-ln -sf $SSH_AUTH_SOCK ~/tmp/perma-ssh/my_agent
-export SSH_AUTH_SOCK=~/tmp/perma-ssh/my_agent
+if [ "$SSH_AUTH_SOCK" != ~/tmp/perma-ssh/my_agent ]; then
+  ln -sf $SSH_AUTH_SOCK ~/tmp/perma-ssh/my_agent
+  export SSH_AUTH_SOCK=~/tmp/perma-ssh/my_agent
+fi
