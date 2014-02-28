@@ -52,8 +52,6 @@ alias red='redis-cli'
 alias reds='redis-server'
 alias sagi='sudo apt-get install'
 
-alias P='pushd'
-alias p='popd'
 alias -g L='|less'
 alias tf='tail -f'
 alias tl='tail -f /var/log/syslog'
