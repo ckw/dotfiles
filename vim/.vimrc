@@ -57,19 +57,6 @@ if has("autocmd")
     autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
     autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
     autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-    autocmd FileType ruby com! PrependComment exec "norm! mq0i#\<Esc>`ql"
-    autocmd FileType ruby nnoremap <leader>c :PrependComment<CR>
-
-    autocmd FileType haskell com! PrependComment exec "norm! mq0i--\<Esc>`qll"
-    autocmd FileType haskell nnoremap <leader>c :PrependComment<CR>
-    autocmd FileType haskell set makeprg=coup\ build
-
-    autocmd FileType vim com! PrependComment exec "norm! mq0i\"\<Esc>`ql"
-    autocmd FileType vim nnoremap <leader>c :PrependComment<CR>
-
-    autocmd FileType cpp,javascript,rust com! PrependComment exec "norm! mq0i//\<Esc>`qll"
-    autocmd FileType cpp,javascript,rust nnoremap <leader>c :PrependComment<CR>
   augroup END
 endif
 
