@@ -88,6 +88,8 @@ alias t='tig'
 alias s='ssh'
 alias h='htop'
 alias k='kill'
+alias lc='litecoind'
+
 alias -g wl='| wc -l'
 
 alias pag='ps aux | ag -i'
