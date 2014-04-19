@@ -142,6 +142,9 @@ else
 fi
 }
 
+function progs(){
+  ls -1 /usr/bin/ | sed '/^.\{1,6\}$/!d' | xargs whatis '{}' 2> /dev/null
+}
 zle -N zle-keymap-select
 zle -N zle-line-finish
 
