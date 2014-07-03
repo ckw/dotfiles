@@ -162,8 +162,10 @@ nnoremap <leader>dr :set relativenumber! relativenumber?<cr>
 nnoremap <leader>dsv :source $MYVIMRC<cr>
 nnoremap <leader>dso :syn on<CR>
 
+"open scratch buffer => sd
 exe "nnoremap " . g:leader_prime . "d :Scratch\<CR>"
-"execute the contents of the current line
+
+"execute the contents of the current line => sx
 exe "nnoremap " . g:leader_prime . "x :exec 'r! ' . getline('.')\<CR>"
 
 nnoremap <leader>f "
