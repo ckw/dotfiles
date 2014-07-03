@@ -156,7 +156,7 @@ nnoremap <leader>dC :CtrlPClearAllCaches<CR>
 nnoremap <leader>dd <C-^>
 nnoremap <leader>de :e<CR>
 nnoremap <leader>dE :bufdo! e!<CR>
-nnoremap <leader>da q:inorm ==j0<cr>
+nnoremap <leader>da q:inorm! ==j0<cr>
 nnoremap <leader>dr :set relativenumber! relativenumber?<cr>
 
 nnoremap <leader>dsv :source $MYVIMRC<cr>
