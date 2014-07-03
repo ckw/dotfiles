@@ -1,9 +1,21 @@
 # RVM
 if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi
 
-source /usr/share/autojump/autojump.sh
+if [ -e "/usr/share/autojump/autojump.sh" ]; then
+  source /usr/share/autojump/autojump.sh
+fi
+
 export TERM=xterm-256color
 export EDITOR=vim
+
+if [ -d "/opt/ghc-7.4.2/bin" ]; then
+  export PATH=/opt/ghc-7.4.2/bin:$PATH
+fi
+
+if [ -d "/usr/local/Cellar" ]; then
+  export PATH=/usr/local/Cellar:$PATH
+fi
+
 # Colors
 autoload -U colors
 colors
@@ -37,7 +49,7 @@ RPROMPT='%{$fg[white]%} $(~/zsh-simple/bin/git-cwd-info)%{$reset_color%}'
 # Show completion on first TAB
 setopt menucomplete
 
-alias ls='ls --color=auto'
+alias ls='ls -G'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
@@ -143,6 +155,7 @@ fi
 }
 
 function progs(){
+  #TODO fix this on OSX
   ls -1 /usr/bin/ | sed '/^.\{1,6\}$/!d' | xargs whatis '{}' 2> /dev/null
 }
 zle -N zle-keymap-select
