@@ -179,6 +179,9 @@ nnoremap <leader>s <C-w>s
 nnoremap <leader>q :q<cr>
 nnoremap <leader>w :w<CR>
 
+"format entire file
+nnoremap <leader>i q:inorm! gg=G<CR>
+
 "send to blackhole register
 nnoremap <leader>r "_d
 nnoremap <leader>n q:inorm<space>
