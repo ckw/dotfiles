@@ -14,6 +14,7 @@ fi
 
 if [ -d "/usr/local/Cellar" ]; then
   export PATH=/usr/local/Cellar:$PATH
+  export LOOKS_LIKE_OSX='TRUE'
 fi
 
 # Colors
