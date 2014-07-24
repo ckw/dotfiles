@@ -155,6 +155,11 @@ else
 fi
 }
 
+#shuffle lines in file
+function shuffle(){
+  perl -MList::Util -e 'print List::Util::shuffle <>' "$@"
+}
+
 function progs(){
   #TODO fix this on OSX
   ls -1 /usr/bin/ | sed '/^.\{1,6\}$/!d' | xargs whatis '{}' 2> /dev/null
