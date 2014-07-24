@@ -155,6 +155,14 @@ else
 fi
 }
 
+function poems(){
+  poems=$(shuffle "$HOME/dotfiles/static/poems")
+  if [[ "$1" -gt 0 ]]; then
+    tail -n "$1" "/dev/fd/0" <<< "$poems"
+  else echo "$poems"
+  fi
+}
+
 #shuffle lines in file
 function shuffle(){
   perl -MList::Util -e 'print List::Util::shuffle <>' "$@"
