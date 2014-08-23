@@ -210,7 +210,9 @@ nnoremap n nzz
 nnoremap N Nzz
 
 nnoremap j gj
+nnoremap gj j
 nnoremap k gk
+nnoremap gk k
 nnoremap <C-j> 15j
 nnoremap <C-k> 15k
 
