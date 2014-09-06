@@ -102,6 +102,7 @@ alias s='ssh'
 alias h='htop'
 alias k='kill'
 alias lc='litecoind'
+alias cb='cabal build'
 
 alias -g wl='| wc -l'
 
@@ -116,7 +117,8 @@ function zle-keymap-select {
   zle reset-prompt
 }
 
-
+#switch to the unique branch that contains the argument string
+#or print out the list of matches
 function gsw() {
   res=$(git branch | grep $1 | cut -d ' ' -f 3 | sed '/^$/d')
   count=$(echo $res | wc -l)
