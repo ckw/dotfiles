@@ -2,7 +2,7 @@
 
 ln -s ~/dotfiles/vim/.vimrc ~/.vimrc
 mkdir -p ~/.vim/autoload ~/.vim/bundle
-curl -so ~/.vim/autoload/pathogen.vim https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim
+curl -o ~/.vim/autoload/pathogen.vim https://raw.githubusercontent.com/tpope/vim-pathogen/master/autoload/pathogen.vim
 cp -r after ~/.vim
 
 cd ~/.vim/bundle
