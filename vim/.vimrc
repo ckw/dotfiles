@@ -7,8 +7,9 @@ endif
 
 set encoding=utf-8
 
-let g:EasyMotion_leader_key = '<Leader>_'
-let g:EasyMotion_keys = 'asdfjkl;eirughwptyo'
+"let g:EasyMotion_leader_key = '<Leader>_'
+"let g:EasyMotion_keys = 'asdfjkl;eirughwptyo'
+let g:EasyMotion_keys = 'asdferwqc'
 let g:LustyJugglerDefaultMappings = 0
 let g:leader_prime = 's'
 
@@ -168,8 +169,6 @@ exe "nnoremap " . g:leader_prime . "d :Scratch\<CR>"
 "execute the contents of the current line => sx
 exe "nnoremap " . g:leader_prime . "x :exec 'r! ' . getline('.')\<CR>"
 
-nnoremap <leader>f "
-
 nnoremap <leader>h <C-w>h
 nnoremap <leader>j <C-w>j
 nnoremap <leader>k <C-w>k
@@ -213,8 +212,6 @@ nnoremap j gj
 nnoremap gj j
 nnoremap k gk
 nnoremap gk k
-nnoremap <C-j> 15j
-nnoremap <C-k> 15k
 
 onoremap <C-j> 15j
 onoremap <C-k> 15k
@@ -223,7 +220,6 @@ vnoremap j gj
 vnoremap k gk
 vnoremap <C-j> 15j
 vnoremap <C-k> 15k
-nnoremap f <esc>:call FindAllChars()<cr>
 
 ":::::::::::::::::::::::::::::::::::::::::::::::;::::::::::::::::::::::::::::::
 let g:Powerline_symbols = 'fancy'
@@ -407,12 +403,26 @@ function! ShowColourSchemeName()
   endtry
 endfunction
 
-function! FindAllChars()
-  set scrolloff=0
-  call setpos('.',[0,line('w0'),0,0])
-  call EasyMotion#F('f',0)
-  set scrolloff=5
-endfunction
+":::::::::::::::::::::::::EasyMotion:::::::::::::::::::::::::::::::::::::::::::
+let g:EasyMotion_do_mapping = 0 " Disable default mappings
+
+"Bi-directional find motion
+" Jump to anywhere you want with minimal keystrokes, with just one key
+"binding.
+nmap f <Plug>(easymotion-s)
+
+nmap <C-j> <Plug>(easymotion-j)
+nmap <C-k> <Plug>(easymotion-k)
+"nmap <C-f> <Plug>(easymotion-lineforward)
+"nmap <C-d> <Plug>(easymotion-linebackward)
+
+
+let g:EasyMotion_startofline = 0 " keep cursor colum when JK motion
+
+" Turn on case sensitive feature
+let g:EasyMotion_smartcase = 1
+
+"::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ":::::::::::::::::::::::::Theme Rotating:::::::::::::::::::::::::::::::::::::::
 let themeindex = 0
