@@ -265,7 +265,7 @@ let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
 
 "The maximum number of files to scan, set to 0 for no limit: >
-let g:ctrlp_max_files = 10000
+let g:ctrlp_max_files = 100000
 
 "The maximum depth of a directory tree to recurse into: >
 let g:ctrlp_max_depth = 40
