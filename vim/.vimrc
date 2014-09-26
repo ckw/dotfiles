@@ -9,7 +9,7 @@ set encoding=utf-8
 
 "let g:EasyMotion_leader_key = '<Leader>_'
 "let g:EasyMotion_keys = 'asdfjkl;eirughwptyo'
-let g:EasyMotion_keys = 'asdferwqc'
+let g:EasyMotion_keys = 'asdferwqcgtvxz'
 let g:LustyJugglerDefaultMappings = 0
 let g:leader_prime = 's'
 
@@ -213,6 +213,9 @@ nnoremap gj j
 nnoremap k gk
 nnoremap gk k
 
+nnoremap <C-j> 15j
+nnoremap <C-k> 15k
+
 onoremap <C-j> 15j
 onoremap <C-k> 15k
 
@@ -411,8 +414,8 @@ let g:EasyMotion_do_mapping = 0 " Disable default mappings
 "binding.
 nmap f <Plug>(easymotion-s)
 
-nmap <C-j> <Plug>(easymotion-j)
-nmap <C-k> <Plug>(easymotion-k)
+"nmap <leader>j <Plug>(easymotion-j)
+"nmap <leader>k <Plug>(easymotion-k)
 "nmap <C-f> <Plug>(easymotion-lineforward)
 "nmap <C-d> <Plug>(easymotion-linebackward)
 
