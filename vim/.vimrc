@@ -51,6 +51,7 @@ if has("autocmd")
     autocmd BufNewFile,BufRead *.js :set ft=javascript
     autocmd BufNewFile,BufRead *.rs :set ft=rust
     autocmd BufNewFile,BufRead *.vimrc :set ft=vim
+    autocmd BufNewFile,BufRead *.scala :set ft=scala
 
     " Enable neocomplcache omni completion.
     autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
