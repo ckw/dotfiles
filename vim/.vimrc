@@ -46,6 +46,7 @@ if has("autocmd")
     autocmd CmdwinLeave * :nnoremap <CR> @:
     autocmd BufWinEnter quickfix nnoremap <buffer> <cr> :.cc<cr>:wincmd p<cr>
     autocmd BufNewFile,BufRead *.json :set ft=json
+    autocmd BufNewFile,BufRead *.php :set ft=php
     autocmd BufNewFile,BufRead *.hs :set ft=haskell
     autocmd BufNewFile,BufRead *.rb :set ft=ruby
     autocmd BufNewFile,BufRead *.js :set ft=javascript
@@ -54,6 +55,7 @@ if has("autocmd")
     autocmd BufNewFile,BufRead *.scala :set ft=scala
 
     " Enable neocomplcache omni completion.
+    autocmd FileType php setlocal noexpandtab
     autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
     autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
     autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
@@ -119,7 +121,6 @@ onoremap ` '
 nnoremap <silent> <leader>o o<Esc>0d$k
 nnoremap <silent> <leader>O O<Esc>0d$j
 
-noremap <F4> :set hlsearch! <CR>
 nnoremap / /\v
 nnoremap % v%
 nnoremap <tab> v%
@@ -162,6 +163,7 @@ nnoremap <leader>de :e<CR>
 nnoremap <leader>dE :bufdo! e!<CR>
 nnoremap <leader>da q:inorm! ==j0<cr>
 nnoremap <leader>dr :set relativenumber! relativenumber?<cr>
+nnoremap <leader>di :set invlist<cr>
 
 nnoremap <leader>dsv :source $MYVIMRC<cr>
 nnoremap <leader>dso :syn on<CR>
@@ -169,8 +171,11 @@ nnoremap <leader>dso :syn on<CR>
 "open scratch buffer => sd
 exe "nnoremap " . g:leader_prime . "d :Scratch\<CR>"
 
+"print to error log the contents of the variable under the cursor (php)
+exe "nnoremap " . g:leader_prime . "l :norm oerror_log('__________________:' . print_r($" . '<C-r>=expand("<cword>")<CR>,true));<CR>'
+
 "execute the contents of the current line => sx
-exe "nnoremap " . g:leader_prime . "x :exec 'r! ' . getline('.')\<CR>"
+exe "nnoremap " . g:leader_prime . "x :call ExecuteCurrentLine()\<CR>"
 
 nnoremap <leader>h <C-w>h
 nnoremap <leader>j <C-w>j
@@ -187,13 +192,14 @@ nnoremap <leader>i q:inorm! gg=G<CR>
 "send to blackhole register
 nnoremap <leader>r "_d
 nnoremap <leader>n q:inorm<space>
+nnoremap <leader>p zfip
+nnoremap <leader>u za
 
 " Pull word under cursor into LHS of a substitute (for quick search and replace)
 nnoremap <leader>z :%s/\<<C-r>=expand("<cword>")<CR>\>/
 nnoremap <leader>; ,
 nnoremap <silent> <leader>t :call RotateColorTheme()<CR>
 nnoremap <leader>ev :e $MYVIMRC<cr>
-nnoremap <leader>p ]p
 nnoremap <leader>a :Ack<Space><c-r><c-W><CR>
 nmap <silent> <Leader><Leader> :LustyJuggler<CR>
 
@@ -407,6 +413,13 @@ function! ShowColourSchemeName()
   catch /^Vim:E121/
     return "default"
   endtry
+endfunction
+
+function! ExecuteCurrentLine()
+  let l:com = getline('.')
+  exe "norm! o\<Esc>"
+  exe "r! " . l:com
+  exe "norm! o\<Esc>"
 endfunction
 
 ":::::::::::::::::::::::::EasyMotion:::::::::::::::::::::::::::::::::::::::::::

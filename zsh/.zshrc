@@ -3,6 +3,7 @@ if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi
 
 export TERM=xterm-256color
 export EDITOR=vim
+export PAGER=less
 
 if [ -d "/opt/ghc-7.4.2/bin" ]; then
   export PATH=/opt/ghc-7.4.2/bin:$PATH
@@ -63,6 +64,7 @@ alias reds='redis-server'
 alias sagi='sudo apt-get install'
 
 alias -g L='|less'
+alias -g fjson='|python -mjson.tool'
 alias tf='tail -f'
 alias tl='tail -f /var/log/syslog'
 alias g='git'

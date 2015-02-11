@@ -21,6 +21,7 @@ git clone https://github.com/kien/ctrlp.vim
 git clone https://github.com/airblade/vim-gitgutter.git
 git clone https://github.com/duff/vim-scratch.git
 git clone https://github.com/derekwyatt/vim-scala
+git clone https://github.com/scrooloose/nerdtree.git
 
 git clone https://github.com/flazz/vim-colorschemes.git ~/.vim/vim-colorschemes
 ln -s ~/.vim/vim-colorschemes/colors ~/.vim/colors
