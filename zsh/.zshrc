@@ -1,10 +1,6 @@
 # RVM
 if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi
 
-if [ -e "/usr/share/autojump/autojump.sh" ]; then
-  source /usr/share/autojump/autojump.sh
-fi
-
 export TERM=xterm-256color
 export EDITOR=vim
 
