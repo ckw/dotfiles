@@ -129,15 +129,17 @@ noremap ; q:i
 nnoremap / q/i\v
 nnoremap ? q?i
 
-noremap <C-l> $
-noremap <C-h> 0
+noremap <C-h> <C-w>h
+noremap <C-l> <C-w>l
 onoremap <C-l> $
 onoremap <C-h> 0
 nnoremap I gI
 nnoremap gI I
 
-nnoremap <left> <esc>:bp<cr>
-nnoremap <right> <esc>:bn<cr>
+nnoremap <silent> <up> :exe "resize " . (winheight(0) * 3/2)<CR>
+nnoremap <silent> <down> :exe "resize " . (winheight(0) * 2/3)<CR>
+nnoremap <silent> <right> :exe "vertical resize " . (winwidth(0) * 3/2)<CR>
+nnoremap <silent> <left> :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
 
 vnoremap <tab> %
 vnoremap / /\v
