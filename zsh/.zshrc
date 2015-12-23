@@ -119,31 +119,9 @@ function zle-keymap-select {
 #switch to the unique branch that contains the argument string
 #or print out the list of matches
 function gsw() {
-  res=$(git branch | grep $1 | cut -d ' ' -f 3 | sed '/^$/d')
-  count=$(echo $res | wc -l)
-
-  if [[ $res == '' ]]; then
-    count='0'
-  fi
-
-  if [[ $count == '1' ]]; then
-    git checkout $res
-
-  elif [[ $count == '0' ]]; then
-    res_r=$(git branch -r | grep $1 | cut -d ' ' -f 3 | sed '/^$/d')
-    count=$(echo $res_r | wc -l)
-
-    if [[ $count == '1' ]]; then
-      git checkout $(echo $res_r | sed 's/^origin\///')
-
-    else
-      echo $res_r
-    fi
-
-  else
-    echo $res
-  fi
+  ~/dotfiles/static/git_switch.rb $1
 }
+
 
 #haskell type
 function ht(){
