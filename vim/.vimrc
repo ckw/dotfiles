@@ -177,6 +177,8 @@ exe "nnoremap " . g:leader_prime . "l :norm oerror_log('__________________:' . p
 "execute the contents of the current line => sx
 exe "nnoremap " . g:leader_prime . "x :call ExecuteCurrentLine()\<CR>"
 
+exe "nnoremap " . g:leader_prime . "c :call ExecuteCurrentLineWithBC()\<CR>"
+
 nnoremap <leader>h <C-w>h
 nnoremap <leader>j <C-w>j
 nnoremap <leader>k <C-w>k
@@ -419,6 +421,13 @@ function! ExecuteCurrentLine()
   let l:com = getline('.')
   exe "norm! o\<Esc>"
   exe "r! " . l:com
+  exe "norm! o\<Esc>"
+endfunction
+
+function! ExecuteCurrentLineWithBC()
+  let l:com = getline('.')
+  exe "norm! o\<Esc>"
+  exe "r! " . "echo 'scale=6;" . l:com . "' | bc"
   exe "norm! o\<Esc>"
 endfunction
 
