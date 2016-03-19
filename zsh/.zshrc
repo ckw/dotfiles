@@ -4,6 +4,7 @@ if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi
 export TERM=xterm-256color
 export EDITOR=vim
 export PAGER=less
+export XDG_CONFIG_HOME=$HOME/.config
 
 if [ -d "/opt/ghc-7.4.2/bin" ]; then
   export PATH=/opt/ghc-7.4.2/bin:$PATH
