@@ -40,7 +40,7 @@ if has("autocmd")
     filetype plugin indent on
 
     " Remove any trailing whitespace
-    autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
+    autocmd BufRead,BufWrite * if ! &bin |:exe "norm mp" | silent! %s/\s\+$//ge | :exe "norm 'p" |  endif
 
     autocmd CmdwinEnter * :nnoremap <CR> <CR>
     autocmd CmdwinLeave * :nnoremap <CR> @:
