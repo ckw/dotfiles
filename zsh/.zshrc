@@ -10,6 +10,10 @@ if [ -d "/opt/ghc-7.4.2/bin" ]; then
   export PATH=/opt/ghc-7.4.2/bin:$PATH
 fi
 
+if [ -d "$HOME/.local/bin" ]; then
+  export PATH="$HOME/.local/bin":$PATH
+fi
+
 if [ -d "/usr/local/Cellar" ]; then
   export PATH=/usr/local/Cellar:$PATH
   export LOOKS_LIKE_OSX='TRUE'
