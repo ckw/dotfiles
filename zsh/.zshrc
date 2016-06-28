@@ -70,6 +70,7 @@ alias sagi='sudo apt-get install'
 
 alias -g L='|less'
 alias -g fjson='|python -mjson.tool'
+alias -g jqf="|jq --sort-keys '.'"
 alias tf='tail -f'
 alias tl='tail -f /var/log/syslog'
 alias g='git'
