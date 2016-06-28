@@ -128,6 +128,12 @@ function gsw() {
   ~/dotfiles/static/git_switch.rb $1
 }
 
+function update-vim-plugins() {
+  pushd ~/.vim/bundle
+  for f in `ls -1` ;do pushd "$f"; git pull; popd;done
+  popd
+}
+
 
 #haskell type
 function ht(){
