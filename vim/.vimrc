@@ -208,13 +208,7 @@ nnoremap <leader>a :Ack<Space><c-r><c-W><CR>
 nmap <silent> <Leader><Leader> :LustyJuggler<CR>
 
 """"""""""""""""""""""unicode character mappings"""""""""""""""""""""""""""""
-nnoremap <leader>uaa aλ<esc>
-nnoremap <leader>ual a→<esc>
-nnoremap <leader>uah a←<esc>
-nnoremap <leader>ua. a∘<esc>
-nnoremap <leader>uaA a∀<esc>
-nnoremap <leader>ua> a⇒<esc>
-nnoremap <leader>ua; a∷<esc>
+nnoremap <leader>u :call Unicodify()<CR>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <CR> @:
 nnoremap <C-b> <esc>:buffers<cr>
@@ -426,6 +420,15 @@ function! TogglePaste()
   endif
 
   execute 'set paste'
+endfunction
+
+function! Unicodify()
+  exe '.s/<-/←/e'
+  exe '.s/::/∷/e'
+  exe '.s/ -> / → /e'
+  exe '.s/ \. / ∘ /e'
+  exe '.s/forall/∀/e'
+  exe '.s/ => / ⇒ /e'
 endfunction
 
 function! ExecuteCurrentLine()
