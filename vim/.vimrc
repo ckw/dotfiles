@@ -109,7 +109,6 @@ let undodir = "/home/ckw/undo_dir_vim"
 let mapleader=" "
 
 inoremap jk  <ESC>
-inoremap df  <ESC>
 
 nnoremap ' `
 nnoremap ` '
