@@ -156,6 +156,7 @@ nnoremap <leader>gl :Glog<CR>:copen<CR>
 
 nnoremap <leader>dg :GundoToggle<CR>
 nnoremap <leader>dq :copen<CR>
+nnoremap <leader>dp :call TogglePaste()<CR>
 nnoremap <leader>dC :CtrlPClearAllCaches<CR>
 nnoremap <leader>dd <C-^>
 nnoremap <leader>de :e<CR>
@@ -414,6 +415,15 @@ function! ShowColourSchemeName()
   catch /^Vim:E121/
     return "default"
   endtry
+endfunction
+
+function! TogglePaste()
+  if(&paste)
+    execute 'set nopaste '
+    return
+  endif
+
+  execute 'set paste'
 endfunction
 
 function! ExecuteCurrentLine()
