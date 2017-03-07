@@ -163,6 +163,11 @@ function progs(){
   #TODO fix this on OSX
   ls -1 /usr/bin/ | sed '/^.\{1,6\}$/!d' | xargs whatis '{}' 2> /dev/null
 }
+
+function uuids(){
+  $HOME/dotfiles/static/uuid.rb "$@"
+}
+
 zle -N zle-keymap-select
 zle -N zle-line-finish
 
