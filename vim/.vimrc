@@ -440,17 +440,16 @@ endfunction
 
 function! ExecuteCurrentParagraph()
   let l:init = line('.')
-  echo l:init
   exe "norm! {j"
   let l:start = line('.')
   exe "norm! }"
   let l:end = line('.')
 
-  if l:end == l:init && l:start == l:init
-    exe 'norm! ' . l:init . 'gg'
-    call ExecuteCurrentLine()
-    return
-  endif
+"  if l:end == l:init && l:start == l:init
+"    exe 'norm! ' . l:init . 'gg'
+"    call ExecuteCurrentLine()
+"    return
+"  endif
 
   exe "norm! o\<Esc>"
   exe "r! " . join(getline(l:start,l:end), ' ')
