@@ -102,8 +102,6 @@ alias gb='git branch'
 alias zk='/usr/share/zookeeper/bin/zkCli.sh'
 alias v='vim'
 alias e='echo'
-alias t='tig'
-alias s='ssh'
 alias h='htop'
 alias k='kill'
 alias lc='litecoind'
@@ -152,6 +150,10 @@ function poems(){
     tail -n "$1" "/dev/fd/0" <<< "$poems"
   else echo "$poems"
   fi
+}
+
+function gen_uuid(){
+  "$HOME/dotfiles/static/gen_uuid.rb"
 }
 
 #shuffle lines in file
