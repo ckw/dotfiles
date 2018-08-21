@@ -432,7 +432,7 @@ function! Unicodify()
 endfunction
 
 function! ExecuteCurrentLine()
-  let l:com = getline('.')
+  let l:com = substitute(getline('.'), '\#', '\\#', 'g')
   exe "norm! o\<Esc>"
   exe "r! " . l:com
   exe "norm! o\<Esc>"
