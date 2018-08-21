@@ -338,13 +338,9 @@ function! Unicodify()
   exe '.s/ => / ⇒ /e'
 endfunction
 
-"function! ExecuteCurrentLine()
-"  exe ". !sh"
-"endfunction
-
 function! ExecuteCurrentLine()
-  let l:com = substitute(getline('.'), '\#', '\\#', '')
   exe "norm! mc"
+  let l:com = substitute(getline('.'), '\#', '\\#', 'g')
   exe "norm! o\<Esc>"
   exe "r! " . l:com
   exe "norm! mr"
