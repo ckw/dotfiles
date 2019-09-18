@@ -6,6 +6,83 @@ export EDITOR=vim
 export PAGER=less
 export XDG_CONFIG_HOME=$HOME/.config
 
+
+pathmunge() {
+    generic-pathmunge PATH "$1" "$2"
+}
+
+library-pathmunge() {
+    generic-pathmunge LD_LIBRARY_PATH "$1" "$2"
+    generic-pathmunge LIBRARY_PATH "$1" "$2"
+}
+
+include-pathmunge() {
+    generic-pathmunge INCLUDE_PATH "$1" "$2"
+    generic-pathmunge C_INCLUDE_PATH "$1" "$2"
+    generic-pathmunge CPLUS_INCLUDE_PATH "$1" "$2"
+}
+
+man-pathmunge () {
+    generic-pathmunge MANPATH "$1" "$2"
+}
+
+clear-paths () {
+    export PATH=
+    export LD_LIBRARY_PATH=
+    export LIBRARY_PATH=
+    export INCLUDE_PATH=
+    export C_INCLUDE_PATH=
+    export CPLUS_INCLUDE_PATH=
+    export MANPATH=
+}
+
+addpaths() {
+    # remove trailing slash if it exists
+    p="${1%/}"
+
+    if [[ -d "$p/" ]]; then
+        pathmunge "$p/sbin" $2
+        pathmunge "$p/bin" $2
+        library-pathmunge "$p/lib" $2
+        include-pathmunge "$p/include" $2
+        man-pathmunge "$p/man" $2
+        man-pathmunge "$p/share/man" $2
+        return 0
+    else
+        return 1
+    fi
+}
+
+generic-pathmunge() {
+
+    # example names: PATH, LD_LIBRARY_PATH, LIBRARY_PATH, INCLUDE_PATH, C_INCLUDE_PATH
+    name=$1
+    pathdir="$2"
+
+    # variable indirection is different on bash and zsh
+    old_path=${(P)name}
+
+    # make sure directory exist.
+
+    # make sure pathdir isn't already in the path variable.
+    # this doesn't work:
+    # "${old_path}" != "*${pathdir}*"
+
+    if [[ -d "${pathdir}" ]]; then
+
+        if [ -z "${old_path}" ]; then
+            export $name="${pathdir}"
+        elif [ "$3" = "after" ]; then
+            export $name="${old_path}":"${pathdir}"
+        else
+            export $name="${pathdir}":"${old_path}"
+        fi
+        return 0
+    else
+        return 1
+    fi
+}
+
 if [ -d "/opt/ghc-7.4.2/bin" ]; then
   export PATH=/opt/ghc-7.4.2/bin:$PATH
 fi
@@ -13,6 +90,22 @@ fi
 if [ -d "$HOME/.local/bin" ]; then
   export PATH="$HOME/.local/bin":$PATH
 fi
+
+if [ -d "/usr/local/opt/postgresql@10/bin" ]; then
+  export PATH="/usr/local/opt/postgresql@10/bin":$PATH
+fi
+
+if [ -d "$HOME/.cargo/bin" ]; then
+  export PATH="$HOME/.cargo/bin":$PATH
+fi
+
+export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
+
+#export PYTHONPATH="/usr/local/lib/python2.7/site-packages":$PYTHONPATH
+
+pathmunge "/Users/connorwilliams/apache-cassandra-2.1.17/bin"
+pathmunge "/Users/connorwilliams/go/bin"
+pathmunge "/Library/TeX/texbin"
 
 if [ -d "/usr/local/Cellar" ]; then
   export PATH=/usr/local/Cellar:$PATH
@@ -30,6 +123,7 @@ SAVEHIST=100000
 HISTSIZE=100000
 HISTFILE=~/.zsh_history
 setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_FIND_NO_DUPS
 setopt inc_append_history
 setopt share_history
@@ -61,9 +155,10 @@ alias egrep='egrep --color=auto'
 # some more ls aliases
 alias ll='ls -alF'
 alias la='ls -lAh'
-alias l='ls -lFhA'
-alias ag='ack-grep -i'
-alias aga='ack-grep -i -C 5'
+#alias l='ls -lFhA'
+alias l='exa -l'
+alias a='ag -i'
+alias aga='ag -i -C 5'
 alias red='redis-cli'
 alias reds='redis-server'
 alias sagi='sudo apt-get install'
@@ -106,6 +201,7 @@ alias h='htop'
 alias k='kill'
 alias lc='litecoind'
 alias cb='cabal build'
+alias b="stack build --fast --ghc-options -j4"
 
 alias -g wl='| wc -l'
 
@@ -136,11 +232,11 @@ function update-vim-plugins() {
 #haskell type
 function ht(){
 if [[ $2 == 't' ]]; then
-  ack-grep -A 5 -i "data \w*$1\w* .*|type \w*$1\w* .*|newtype \w*$1\w* .*"
+  ag -A 5 -i "data \w*$1\w* .*|type \w*$1\w* .*|newtype \w*$1\w* .*"
 elif [[ $2 == 'f' ]]; then
-  ack-grep -A 5 -i "[\w']*$1[\w']* ::"
+  ag -A 5 -i "[\w']*$1[\w']* ::"
 else
-  ack-grep -A 5 -i "data \w*$1\w* .*|type \w*$1\w* .*|newtype \w*$1\w* .* |[\w']*$1[\w']* ::"
+  ag -A 5 -i "data \w*$1\w* .*|type \w*$1\w* .*|newtype \w*$1\w* .* |[\w']*$1[\w']* ::"
 fi
 }
 
@@ -177,7 +273,7 @@ zle -N zle-line-finish
 # Load completions for Ruby, Git, etc.
 autoload -U compinit && compinit -u
 
-if [ "$SSH_AUTH_SOCK" != ~/tmp/perma-ssh/my_agent ]; then
-  ln -sf $SSH_AUTH_SOCK ~/tmp/perma-ssh/my_agent
-  export SSH_AUTH_SOCK=~/tmp/perma-ssh/my_agent
-fi
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

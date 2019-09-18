@@ -6,14 +6,86 @@ if has("syntax")
 endif
 
 set encoding=utf-8
+let g:ale_linters = {
+  \  'haskell': ['stack build --fast -j2 --ghc-options -j4 --flag ExaTMS:dev', 'hlint'],
+  \}
+
+  " \  'sql': []
+  "\  'haskell': ['hie-wrapper']
+" , ]
+
+let g:airline_theme='powerlineish'
+"let g:airline_powerline_fonts = 1
 
 "let g:EasyMotion_leader_key = '<Leader>_'
 "let g:EasyMotion_keys = 'asdfjkl;eirughwptyo'
 let g:EasyMotion_keys = 'asdferwqcgtvxz'
-let g:LustyJugglerDefaultMappings = 0
 let g:leader_prime = 's'
 
-call pathogen#infect()
+let g:LanguageClient_autoStart = 1
+let g:LanguageClient_serverCommands = {
+    \ 'haskell': ['hie-wrapper', '--lsp'],
+    \ }
+
+hi link ALEError Error
+hi Warning term=underline cterm=underline ctermfg=Yellow gui=undercurl guisp=Gold
+hi link ALEWarning Warning
+hi link ALEInfo SpellCap
+
+    " \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
+    " \ 'javascript': ['/usr/local/bin/javascript-typescript-stdio'],
+    " \ 'javascript.jsx': ['tcp://127.0.0.1:2089'],
+    " \ 'python': ['/usr/local/bin/pyls'],
+
+"map <Leader>dt :SyntasticToggleMode<CR>
+
+"set statusline+=%#warningmsg#
+"set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%*
+
+"let g:syntastic_always_populate_loc_list = 0
+"let g:syntastic_auto_loc_list = 0
+"let g:syntastic_check_on_open = 0
+"let g:syntastic_check_on_wq = 0
+"let g:syntastic_aggregate_errors = 1
+
+
+"let g:tsuquyomi_disable_default_mappings = 1
+"let g:tsuquyomi_disable_quickfix = 1
+"let g:syntastic_typescript_checkers = ['tsuquyomi']
+
+"call pathogen#infect()
+
+call plug#begin('~/.vim/bundle')
+
+Plug 'scrooloose/nerdtree'
+Plug '/usr/local/opt/fzf'
+Plug 'junegunn/fzf.vim'
+Plug 'easymotion/vim-easymotion'
+Plug 'tpope/vim-surround'
+Plug '~/.vim/bundle/LustyJuggler'
+Plug 'w0rp/ale'
+Plug 'Shougo/vimproc'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'vim-airline/vim-airline'
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+Plug 'Valloric/YouCompleteMe/'
+
+"Plug 'autozimu/LanguageClient-neovim', {
+"    \ 'branch': 'next',
+"    \ 'do': 'bash install.sh',
+"    \ }
+
+
+call plug#end()
+
+"if !exists('g:airline_symbols')
+"  let g:airline_symbols = {}
+"endif
+"let g:airline_symbols.space = "\ua0"
+
+let g:LustyJugglerDefaultMappings = 0
 
 set fillchars+=stl:\ ,stlnc:\
 set background=dark
@@ -53,20 +125,49 @@ if has("autocmd")
     autocmd BufNewFile,BufRead *.rs :set ft=rust
     autocmd BufNewFile,BufRead *.vimrc :set ft=vim
     autocmd BufNewFile,BufRead *.scala :set ft=scala
+    autocmd BufNewFile,BufRead *.elm :set ft=elm
+    autocmd BufNewFile,BufRead *.ts :set ft=typescript
+
 
     " Enable neocomplcache omni completion.
-    autocmd FileType php setlocal noexpandtab
-    autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-    autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-    autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-    autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-    autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+    "autocmd FileType php setlocal noexpandtab
+    "autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+    "autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+    "autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+    "autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+    "autocmd FileType typescript setlocal omnifunc=typescriptcomplete#Complete
+
+    " Ruby is an oddball in the family, use special spacing/rules
+    if v:version >= 703
+      " Note: Relative number is quite slow with Ruby, so is cursorline
+      autocmd FileType ruby setlocal ts=2 sts=2 sw=2 norelativenumber nocursorline
+    else
+      autocmd FileType ruby setlocal ts=2 sts=2 sw=2
+    endif
+
+    "autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+
+    "autocmd FileType elm setglobal syntastic_always_populate_loc_list=1
+    "autocmd FileType elm setglobal syntastic_auto_loc_list=1
+    "autocmd FileType elm setglobal elm_syntastic_show_warnings=1
+
   augroup END
+
+"  augroup tags
+"  au BufWritePost *.hs            silent !init-tags %
+"  au BufWritePost *.hsc           silent !init-tags %
+"  augroup END
 endif
 
 ":::::::::::::::::::::::::::::::::settings::::::::::::::::::::::::::::::::::::
 "
-set clipboard=unnamed
+
+if(&ft == 'elm')
+  call ElmSettings()
+endif
+
+set clipboard="
 set cmdheight=4
 set showcmd		" Show (partial) command in status line.
 set showmatch		" Show matching brackets.
@@ -97,7 +198,7 @@ set softtabstop=2
 set expandtab
 set ls=2
 set synmaxcol=2048      " Syntax coloring too-long lines is slow
-set colorcolumn=85
+set colorcolumn=120
 set undofile
 set lazyredraw
 set noswapfile
@@ -129,10 +230,13 @@ noremap ; q:i
 nnoremap / q/i\v
 nnoremap ? q?i
 
-noremap <C-h> <C-w>h
-noremap <C-l> <C-w>l
+"noremap <C-h> <C-w>h
+"noremap <C-l> <C-w>l
 onoremap <C-l> $
 onoremap <C-h> 0
+noremap <C-l> $
+noremap <C-h> 0
+
 nnoremap I gI
 nnoremap gI I
 
@@ -181,6 +285,8 @@ exe "nnoremap " . g:leader_prime . "p :call ExecuteCurrentParagraph()\<CR>"
 
 exe "nnoremap " . g:leader_prime . "c :call ExecuteCurrentLineWithBC()\<CR>"
 
+exe "nnoremap " . g:leader_prime . 's :Files<CR>'
+
 nnoremap <leader>h <C-w>h
 nnoremap <leader>j <C-w>j
 nnoremap <leader>k <C-w>k
@@ -204,12 +310,16 @@ nnoremap <leader>z :%s/\<<C-r>=expand("<cword>")<CR>\>/
 nnoremap <leader>; ,
 nnoremap <silent> <leader>t :call RotateColorTheme()<CR>
 nnoremap <leader>ev :e $MYVIMRC<cr>
-nnoremap <leader>a :Ack<Space><c-r><c-W><CR>
+nnoremap <leader>a :Rg <C-r>=expand("<cword>")<CR><CR>
+nnoremap <leader>f :call LanguageClient#textDocument_definition()<CR>
+
 nmap <silent> <Leader><Leader> :LustyJuggler<CR>
 
 """"""""""""""""""""""unicode character mappings"""""""""""""""""""""""""""""
 nnoremap <leader>u :call Unicodify()<CR>
+nnoremap <leader>du :call DeUnicodify()<CR>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap <leader>b @@
 nnoremap <CR> @:
 nnoremap <C-b> <esc>:buffers<cr>
 nnoremap n nzz
@@ -220,16 +330,16 @@ nnoremap gj j
 nnoremap k gk
 nnoremap gk k
 
-nnoremap <C-j> 15j
-nnoremap <C-k> 15k
+nnoremap <C-j> 15gj
+nnoremap <C-k> 15gk
 
-onoremap <C-j> 15j
-onoremap <C-k> 15k
+onoremap <C-j> 15gj
+onoremap <C-k> 15gk
 
 vnoremap j gj
 vnoremap k gk
-vnoremap <C-j> 15j
-vnoremap <C-k> 15k
+vnoremap <C-j> 15gj
+vnoremap <C-k> 15gk
 
 ":::::::::::::::::::::::::::::::::::::::::::::::;::::::::::::::::::::::::::::::
 let g:Powerline_symbols = 'fancy'
@@ -243,138 +353,138 @@ let g:gundo_preview_height = 15
 let g:gundo_width = 45
 ":::::::::::::::::::::::::Gundo::::::::::::::::::::::::::::::::::::::::::::::::
 "
-":::::::::::::::::::::::::CTRLP::::::::::::::::::::::::::::::::::::::::::::::::
-"Use this option to change the mapping to invoke CtrlP in |Normal| mode: >
-let g:ctrlp_map = g:leader_prime . 's'
-
-"Set the default opening command to use when pressing the above mapping: >
-let g:ctrlp_cmd = 'CtrlPMixed'
-
-"Set the maximum height of the match window: >
-let g:ctrlp_max_height = 20
-
-"When opening a file with <cr> or <c-t>, if the file's already opened somewhere
-"CtrlP will try to jump to it instead of opening a new instance: >
-let g:ctrlp_switch_buffer = 1
-
-"When starting up, CtrlP sets its local working directory according to this
-"variable: >
-let g:ctrlp_working_path_mode = 'rc'
-
-
-let g:ctrlp_root_markers = ['.cabal', 'Gemfile', '.git']
-
-"Set this to 0 to enable cross-session caching by not deleting the cache files
-"upon exiting Vim: >
-let g:ctrlp_clear_cache_on_exit = 0
-
-"Set the directory to store the cache files: >
-let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
-
-"The maximum number of files to scan, set to 0 for no limit: >
-let g:ctrlp_max_files = 100000
-
-"The maximum depth of a directory tree to recurse into: >
-let g:ctrlp_max_depth = 40
-
-"Use this option to specify how the newly created file is to be opened when
-"pressing <c-y>:
-"  t - in a new tab
-"  h - in a new horizontal split
-"  v - in a new vertical split
-"  r - in the current window
-let g:ctrlp_open_new_file = 'r'
-
-let g:ctrlp_open_multiple_files = 'ri'
-
-"If non-zero, CtrlP will follow symbolic links when listing files: >
-let g:ctrlp_follow_symlinks = 0
-
-
-
-let g:ctrlp_prompt_mappings = {
-      \ 'PrtBS()':              ['<bs>', '<c-]>'],
-      \ 'PrtDelete()':          ['<del>'],
-      \ 'PrtDeleteWord()':      ['<c-w>'],
-      \ 'PrtClear()':           ['<c-u>'],
-      \ 'PrtSelectMove("j")':   ['<c-j>', '<down>'],
-      \ 'PrtSelectMove("k")':   ['<c-k>', '<up>'],
-      \ 'PrtSelectMove("t")':   ['<Home>', '<kHome>'],
-      \ 'PrtSelectMove("b")':   ['<End>', '<kEnd>'],
-      \ 'PrtSelectMove("u")':   ['<PageUp>', '<kPageUp>'],
-      \ 'PrtSelectMove("d")':   ['<PageDown>', '<kPageDown>'],
-      \ 'PrtHistory(-1)':       ['<c-n>'],
-      \ 'PrtHistory(1)':        ['<c-p>'],
-      \ 'AcceptSelection("e")': ['<cr>', '<2-LeftMouse>'],
-      \ 'AcceptSelection("h")': ['<c-x>', '<c-cr>', '<c-s>'],
-      \ 'AcceptSelection("t")': ['<c-t>'],
-      \ 'AcceptSelection("v")': ['<c-v>', '<RightMouse>'],
-      \ 'ToggleFocus()':        ['<c-j><k>'],
-      \ 'ToggleRegex()':        ['<c-r>'],
-      \ 'ToggleByFname()':      ['<c-d>'],
-      \ 'ToggleType(1)':        ['<c-f>', '<c-up>'],
-      \ 'ToggleType(-1)':       ['<c-b>', '<c-down>'],
-      \ 'PrtExpandDir()':       ['<tab>'],
-      \ 'PrtInsert("c")':       ['<MiddleMouse>', '<insert>'],
-      \ 'PrtInsert()':          ['<c-\>'],
-      \ 'PrtCurStart()':        ['<c-a>'],
-      \ 'PrtCurEnd()':          ['<c-e>'],
-      \ 'PrtCurLeft()':         ['<c-h>', '<left>', '<c-^>'],
-      \ 'PrtCurRight()':        ['<c-l>', '<right>'],
-      \ 'PrtClearCache()':      ['<F5>'],
-      \ 'PrtDeleteEnt()':       ['<F7>'],
-      \ 'CreateNewFile()':      ['<c-y>'],
-      \ 'MarkToOpen()':         ['<c-o>'],
-      \ 'OpenMulti()':          ['<c-u>'],
-      \ 'PrtExit()':            ['<esc>', '<c-c>', '<c-g>'],
-      \ }
-":::::::::::::::::::::::::CTRLP::::::::::::::::::::::::::::::::::::::::::::::::
+"":::::::::::::::::::::::::CTRLP::::::::::::::::::::::::::::::::::::::::::::::::
+""Use this option to change the mapping to invoke CtrlP in |Normal| mode: >
+"let g:ctrlp_map = g:leader_prime . 's'
+"
+""Set the default opening command to use when pressing the above mapping: >
+"let g:ctrlp_cmd = 'CtrlPMixed'
+"
+""Set the maximum height of the match window: >
+"let g:ctrlp_max_height = 20
+"
+""When opening a file with <cr> or <c-t>, if the file's already opened somewhere
+""CtrlP will try to jump to it instead of opening a new instance: >
+"let g:ctrlp_switch_buffer = 1
+"
+""When starting up, CtrlP sets its local working directory according to this
+""variable: >
+"let g:ctrlp_working_path_mode = 'rc'
+"
+"
+"let g:ctrlp_root_markers = ['.cabal', 'Gemfile', '.git']
+"
+""Set this to 0 to enable cross-session caching by not deleting the cache files
+""upon exiting Vim: >
+"let g:ctrlp_clear_cache_on_exit = 0
+"
+""Set the directory to store the cache files: >
+"let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
+"
+""The maximum number of files to scan, set to 0 for no limit: >
+"let g:ctrlp_max_files = 100000
+"
+""The maximum depth of a directory tree to recurse into: >
+"let g:ctrlp_max_depth = 40
+"
+""Use this option to specify how the newly created file is to be opened when
+""pressing <c-y>:
+""  t - in a new tab
+""  h - in a new horizontal split
+""  v - in a new vertical split
+""  r - in the current window
+"let g:ctrlp_open_new_file = 'r'
+"
+"let g:ctrlp_open_multiple_files = 'ri'
+"
+""If non-zero, CtrlP will follow symbolic links when listing files: >
+"let g:ctrlp_follow_symlinks = 0
+"
+"
+"
+"let g:ctrlp_prompt_mappings = {
+"      \ 'PrtBS()':              ['<bs>', '<c-]>'],
+"      \ 'PrtDelete()':          ['<del>'],
+"      \ 'PrtDeleteWord()':      ['<c-w>'],
+"      \ 'PrtClear()':           ['<c-u>'],
+"      \ 'PrtSelectMove("j")':   ['<c-j>', '<down>'],
+"      \ 'PrtSelectMove("k")':   ['<c-k>', '<up>'],
+"      \ 'PrtSelectMove("t")':   ['<Home>', '<kHome>'],
+"      \ 'PrtSelectMove("b")':   ['<End>', '<kEnd>'],
+"      \ 'PrtSelectMove("u")':   ['<PageUp>', '<kPageUp>'],
+"      \ 'PrtSelectMove("d")':   ['<PageDown>', '<kPageDown>'],
+"      \ 'PrtHistory(-1)':       ['<c-n>'],
+"      \ 'PrtHistory(1)':        ['<c-p>'],
+"      \ 'AcceptSelection("e")': ['<cr>', '<2-LeftMouse>'],
+"      \ 'AcceptSelection("h")': ['<c-x>', '<c-cr>', '<c-s>'],
+"      \ 'AcceptSelection("t")': ['<c-t>'],
+"      \ 'AcceptSelection("v")': ['<c-v>', '<RightMouse>'],
+"      \ 'ToggleFocus()':        ['<c-j><k>'],
+"      \ 'ToggleRegex()':        ['<c-r>'],
+"      \ 'ToggleByFname()':      ['<c-d>'],
+"      \ 'ToggleType(1)':        ['<c-f>', '<c-up>'],
+"      \ 'ToggleType(-1)':       ['<c-b>', '<c-down>'],
+"      \ 'PrtExpandDir()':       ['<tab>'],
+"      \ 'PrtInsert("c")':       ['<MiddleMouse>', '<insert>'],
+"      \ 'PrtInsert()':          ['<c-\>'],
+"      \ 'PrtCurStart()':        ['<c-a>'],
+"      \ 'PrtCurEnd()':          ['<c-e>'],
+"      \ 'PrtCurLeft()':         ['<c-h>', '<left>', '<c-^>'],
+"      \ 'PrtCurRight()':        ['<c-l>', '<right>'],
+"      \ 'PrtClearCache()':      ['<F5>'],
+"      \ 'PrtDeleteEnt()':       ['<F7>'],
+"      \ 'CreateNewFile()':      ['<c-y>'],
+"      \ 'MarkToOpen()':         ['<c-o>'],
+"      \ 'OpenMulti()':          ['<c-u>'],
+"      \ 'PrtExit()':            ['<esc>', '<c-c>', '<c-g>'],
+"      \ }
+"":::::::::::::::::::::::::CTRLP::::::::::::::::::::::::::::::::::::::::::::::::
 "
 ":::::::::::::::::::::::::NEOCOMPL:::::::::::::::::::::::::::::::::::::::::::::
-let g:neocomplcache_enable_at_startup = 1
-" Disable AutoComplPop.
-let g:acp_enableAtStartup = 0
-" Use neocomplcache.
-let g:neocomplcache_enable_at_startup = 1
-" Use smartcase.
-let g:neocomplcache_enable_smart_case = 1
-" Use camel case completion.
-let g:neocomplcache_enable_camel_case_completion = 1
-" Use underbar completion.
-let g:neocomplcache_enable_underbar_completion = 1
-" Set minimum syntax keyword length.
-let g:neocomplcache_min_syntax_length = 3
-let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
-
-" Define dictionary.
-let g:neocomplcache_dictionary_filetype_lists = {
-      \ 'default' : '',
-      \ 'vimshell' : $HOME.'/.vimshell_hist',
-      \ 'scheme' : $HOME.'/.gosh_completions'
-      \ }
-
-" Define keyword.
-if !exists('g:neocomplcache_keyword_patterns')
-  let g:neocomplcache_keyword_patterns = {}
-endif
-let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
-
-" Recommended key-mappings.
-" <CR>: close popup and save indent.
-inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
-" <TAB>: completion.
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-
-" Enable heavy omni completion.
-if !exists('g:neocomplcache_omni_patterns')
-  let g:neocomplcache_omni_patterns = {}
-endif
-let g:neocomplcache_omni_patterns.ruby = '[^.  *\t]\.\w*\|\h\w*::'
-"autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
-let g:neocomplcache_omni_patterns.php = '[^.  \t]->\h\w*\|\h\w*::'
-let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
-let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
-
+"let g:neocomplcache_enable_at_startup = 1
+"" Disable AutoComplPop.
+"let g:acp_enableAtStartup = 0
+"" Use neocomplcache.
+"let g:neocomplcache_enable_at_startup = 1
+"" Use smartcase.
+"let g:neocomplcache_enable_smart_case = 1
+"" Use camel case completion.
+"let g:neocomplcache_enable_camel_case_completion = 1
+"" Use underbar completion.
+"let g:neocomplcache_enable_underbar_completion = 1
+"" Set minimum syntax keyword length.
+"let g:neocomplcache_min_syntax_length = 3
+"let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
+"
+"" Define dictionary.
+"let g:neocomplcache_dictionary_filetype_lists = {
+"      \ 'default' : '',
+"      \ 'vimshell' : $HOME.'/.vimshell_hist',
+"      \ 'scheme' : $HOME.'/.gosh_completions'
+"      \ }
+"
+"" Define keyword.
+"if !exists('g:neocomplcache_keyword_patterns')
+"  let g:neocomplcache_keyword_patterns = {}
+"endif
+"let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
+"
+"" Recommended key-mappings.
+"" <CR>: close popup and save indent.
+"inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
+"" <TAB>: completion.
+"inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+"
+"" Enable heavy omni completion.
+"if !exists('g:neocomplcache_omni_patterns')
+"  let g:neocomplcache_omni_patterns = {}
+"endif
+"let g:neocomplcache_omni_patterns.ruby = '[^.  *\t]\.\w*\|\h\w*::'
+""autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
+"let g:neocomplcache_omni_patterns.php = '[^.  \t]->\h\w*\|\h\w*::'
+"let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
+"let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
+"
 
 ":::::::::::::::::::::::::NEOCOMPL:::::::::::::::::::::::::::::::::::::::::::::
 ":::::::::::::::::::::::::helper functions:::::::::::::::::::::::::::::::::::::
@@ -429,13 +539,41 @@ function! Unicodify()
   exe '.s/ \. / ∘ /e'
   exe '.s/forall/∀/e'
   exe '.s/ => / ⇒ /e'
+  exe '.s/\/=/≠/e'
+endfunction
+
+function! DeUnicodify()
+  exe '.s/←/<-/e'
+  exe '.s/∷/::/e'
+  exe '.s/ → / -> /e'
+  exe '.s/ ∘ / \. /e'
+  exe '.s/∀/forall/e'
+  exe '.s/ ⇒ / => /e'
+  exe '.s/≠/\/=/e'
 endfunction
 
 function! ExecuteCurrentLine()
   let l:com = substitute(getline('.'), '\#', '\\#', 'g')
+  let l:com_ = substitute(l:com, '\!', '\\!', 'g')
   exe "norm! o\<Esc>"
-  exe "r! " . l:com
+  exe "r! " . l:com_
   exe "norm! o\<Esc>"
+endfunction
+
+function! ElmSettings()
+    let g:syntastic_always_populate_loc_list = 1
+    let g:syntastic_auto_loc_list = 1
+    let g:elm_syntastic_show_warnings = 1
+    let g:elm_jump_to_error = 0
+
+    let g:elm_make_output_file = "elm.js"
+    let g:elm_make_show_warnings = 0
+    let g:elm_syntastic_show_warnings = 0
+    let g:elm_browser_command = ""
+    let g:elm_detailed_complete = 0
+    let g:elm_format_autosave = 0
+    let g:elm_format_fail_silently = 0
+    let g:elm_setup_keybindings = 0
 endfunction
 
 function! ExecuteCurrentParagraph()
@@ -461,6 +599,12 @@ function! ExecuteCurrentLineWithBC()
   exe "norm! o\<Esc>"
   exe "r! " . "echo 'scale=6;" . l:com . "' | bc"
   exe "norm! o\<Esc>"
+endfunction
+
+function! RipgrepSearch()
+  let l:term = expand("<cword>")
+  "let l:dir = system("git rev-parse --show-toplevel")
+  exe "norm! :Rg " . l:term . "\<Esc>"
 endfunction
 
 ":::::::::::::::::::::::::EasyMotion:::::::::::::::::::::::::::::::::::::::::::
@@ -505,6 +649,13 @@ let c_schemes = ["inkpot",
       \ ]
 
 
+function! ClearUndo()
+  let old_undolevels = &undolevels
+  set undolevels=-1
+  exe "normal a \<BS>\<Esc>"
+  let &undolevels = old_undolevels
+  unlet old_undolevels
+endfunction
 
 function! RotateColorTheme()
   let g:themeindex = (g:themeindex + 1) % len(g:c_schemes)
