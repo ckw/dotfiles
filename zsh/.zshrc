@@ -1,18 +1,37 @@
 # RVM
 if [[ -s ~/.rvm/scripts/rvm ]] ; then source ~/.rvm/scripts/rvm ; fi
 
+set +x
+
 export TERM=xterm-256color
-export EDITOR=vim
+export EDITOR=nvim
 export PAGER=less
 export XDG_CONFIG_HOME=$HOME/.config
+export PYOPENCL_CTX='1'
+export PYOPENCL_COMPILER_OUTPUT=1
 
-if [ -d "/opt/ghc-7.4.2/bin" ]; then
-  export PATH=/opt/ghc-7.4.2/bin:$PATH
+if [ -d "$HOME/.asdf/asdf.sh" ]; then
+  . $HOME/.asdf/asdf.sh
+  # append completions to fpath
+  fpath=(${ASDF_DIR}/completions $fpath)
+  # initialise completions with ZSH's compinit
+  autoload -Uz compinit && compinit
+fi
+
+
+if [ -d "$HOME/.stack/programs/x86_64-linux/ghc-8.10.4/bin" ]; then
+  export PATH="$HOME/.stack/programs/x86_64-linux/ghc-8.10.4/bin":$PATH
 fi
 
 if [ -d "$HOME/.local/bin" ]; then
   export PATH="$HOME/.local/bin":$PATH
 fi
+
+if [ -d "$HOME/.cargo/bin" ]; then
+  export PATH="$HOME/.cargo/bin":$PATH
+fi
+
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
 
 if [ -d "/usr/local/Cellar" ]; then
   export PATH=/usr/local/Cellar:$PATH
@@ -24,15 +43,23 @@ fi
 autoload -U colors
 colors
 setopt prompt_subst
+setopt rcquotes
 set -o vi
 #bindkey -v
 SAVEHIST=100000
 HISTSIZE=100000
 HISTFILE=~/.zsh_history
-setopt HIST_IGNORE_DUPS
-setopt HIST_FIND_NO_DUPS
 setopt inc_append_history
 setopt share_history
+
+setopt EXTENDED_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_FIND_NO_DUPS
+setopt HIST_SAVE_NO_DUPS
+
 setopt auto_cd
 setopt auto_pushd
 bindkey '^R' history-incremental-search-backward
@@ -53,17 +80,18 @@ RPROMPT='%{$fg[white]%} $(~/zsh-simple/bin/git-cwd-info)%{$reset_color%}'
 # Show completion on first TAB
 setopt menucomplete
 
-alias ls='ls -G'
+alias ls='ls --color=auto -G'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
 # some more ls aliases
-alias ll='ls -alF'
-alias la='ls -lAh'
-alias l='ls -lFhA'
+alias ll='ls --color=auto -alF'
+alias la='ls --color=auto -lAh'
+alias l='ls --color=auto -BlFhA'
 alias ag='ack-grep -i'
 alias aga='ack-grep -i -C 5'
+alias r='rg -i '
 alias red='redis-cli'
 alias reds='redis-server'
 alias sagi='sudo apt-get install'
@@ -100,7 +128,7 @@ alias gri='git rebase -i'
 alias gb='git branch'
 
 alias zk='/usr/share/zookeeper/bin/zkCli.sh'
-alias v='vim'
+alias v='nvim'
 alias e='echo'
 alias h='htop'
 alias k='kill'
@@ -109,7 +137,9 @@ alias cb='cabal build'
 
 alias -g wl='| wc -l'
 
-alias pag='ps aux | ag -i'
+alias pag='ps aux | rg -i'
+
+alias f='fzf'
 
 function zle-line-finish {
   vim_mode=$vim_ins_mode
@@ -132,15 +162,14 @@ function update-vim-plugins() {
   popd
 }
 
-
 #haskell type
 function ht(){
 if [[ $2 == 't' ]]; then
-  ack-grep -A 5 -i "data \w*$1\w* .*|type \w*$1\w* .*|newtype \w*$1\w* .*"
+  rg -A 5 -i "data \w*$1\w* .*|type \w*$1\w* .*|newtype \w*$1\w* .*"
 elif [[ $2 == 'f' ]]; then
-  ack-grep -A 5 -i "[\w']*$1[\w']* ::"
+  rg -A 5 -i "[\w']*$1[\w']* ::"
 else
-  ack-grep -A 5 -i "data \w*$1\w* .*|type \w*$1\w* .*|newtype \w*$1\w* .* |[\w']*$1[\w']* ::"
+  rg -A 5 -i "data \w*$1\w* .*|type \w*$1\w* .*|newtype \w*$1\w* .* |[\w']*$1[\w']* ::"
 fi
 }
 
@@ -177,7 +206,20 @@ zle -N zle-line-finish
 # Load completions for Ruby, Git, etc.
 autoload -U compinit && compinit -u
 
-if [ "$SSH_AUTH_SOCK" != ~/tmp/perma-ssh/my_agent ]; then
-  ln -sf $SSH_AUTH_SOCK ~/tmp/perma-ssh/my_agent
-  export SSH_AUTH_SOCK=~/tmp/perma-ssh/my_agent
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+export PATH=$(dedup-path)
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/ckw/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/ckw/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/ckw/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/ckw/anaconda3/bin:$PATH"
+    fi
 fi
+unset __conda_setup

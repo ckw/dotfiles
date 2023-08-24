@@ -2,4 +2,3 @@
 
 ln -s ~/dotfiles/zsh/.zshrc ~/.zshrc
 git clone https://github.com/topfunky/zsh-simple.git ~/zsh-simple
-mkdir -vp ~/tmp/perma-ssh/

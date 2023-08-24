@@ -1,3 +1,4 @@
+
 runtime! debian.vim
 set nocompatible
 
@@ -7,13 +8,52 @@ endif
 
 set encoding=utf-8
 
-"let g:EasyMotion_leader_key = '<Leader>_'
-"let g:EasyMotion_keys = 'asdfjkl;eirughwptyo'
-let g:EasyMotion_keys = 'asdferwqcgtvxz'
+let g:EasyMotion_keys = 'asdfjkl;eirughwptyo'
 let g:LustyJugglerDefaultMappings = 0
 let g:leader_prime = 's'
 
-call pathogen#infect()
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+
+" The following are examples of different formats supported.
+" Keep Plugin commands between vundle#begin/end.
+
+" TODO SURROUND plugin
+Plugin 'junegunn/fzf'
+Plugin 'junegunn/fzf.vim'
+Plugin 'jremmen/vim-ripgrep'
+Plugin 'easymotion/vim-easymotion'
+Plugin 'preservim/nerdtree'
+
+Plugin 'williamboman/mason.nvim'
+Plugin 'williamboman/mason-lspconfig.nvim'
+Plugin 'neovim/nvim-lspconfig'
+Plugin 'hrsh7th/nvim-cmp'
+Plugin 'hrsh7th/cmp-buffer'
+Plugin 'hrsh7th/cmp-nvim-lsp'
+Plugin 'hrsh7th/cmp-path'
+Plugin 'hrsh7th/cmp-cmdline'
+
+Plugin 'L3MON4D3/LuaSnip'
+Plugin 'saadparwaiz1/cmp_luasnip'
+
+Plugin 'nvim-lua/plenary.nvim'
+Plugin 'mhanberg/elixir.nvim'
+Plugin 'elixir-editors/vim-elixir'
+
+Plugin 'tikhomirov/vim-glsl'
+
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+
 
 set fillchars+=stl:\ ,stlnc:\
 set background=dark
@@ -44,7 +84,9 @@ if has("autocmd")
 
     autocmd CmdwinEnter * :nnoremap <CR> <CR>
     autocmd CmdwinLeave * :nnoremap <CR> @:
-    autocmd BufWinEnter quickfix nnoremap <buffer> <cr> :.cc<cr>:wincmd p<cr>
+    autocmd BufwinEnter quickfix :nnoremap <CR> <CR>
+    autocmd BufwinLeave quickfix :nnoremap <CR> @:
+
     autocmd BufNewFile,BufRead *.json :set ft=json
     autocmd BufNewFile,BufRead *.php :set ft=php
     autocmd BufNewFile,BufRead *.hs :set ft=haskell
@@ -54,15 +96,10 @@ if has("autocmd")
     autocmd BufNewFile,BufRead *.vimrc :set ft=vim
     autocmd BufNewFile,BufRead *.scala :set ft=scala
 
-    " Enable neocomplcache omni completion.
-    autocmd FileType php setlocal noexpandtab
-    autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-    autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-    autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-    autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-    autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
   augroup END
 endif
+
+
 
 ":::::::::::::::::::::::::::::::::settings::::::::::::::::::::::::::::::::::::
 "
@@ -97,11 +134,12 @@ set softtabstop=2
 set expandtab
 set ls=2
 set synmaxcol=2048      " Syntax coloring too-long lines is slow
-set colorcolumn=85
+"set colorcolumn=140
 set undofile
 set lazyredraw
 set noswapfile
 set timeoutlen=500
+set list listchars=tab:>\ ,trail:-,eol:$
 
 let undodir = "/home/ckw/undo_dir_vim"
 
@@ -168,11 +206,13 @@ nnoremap <leader>di :set invlist<cr>
 nnoremap <leader>dsv :source $MYVIMRC<cr>
 nnoremap <leader>dso :syn on<CR>
 
+"nnoremap <leader>f :FZF<CR>
+
+"open fuzzy file finder => ss
+exe "nnoremap " . g:leader_prime . "s :FZF\<CR>"
+
 "open scratch buffer => sd
 exe "nnoremap " . g:leader_prime . "d :Scratch\<CR>"
-
-"print to error log the contents of the variable under the cursor (php)
-exe "nnoremap " . g:leader_prime . "l :norm oerror_log('__________________:' . print_r($" . '<C-r>=expand("<cword>")<CR>,true));<CR>'
 
 "execute the contents of the current line => sx
 exe "nnoremap " . g:leader_prime . "x :call ExecuteCurrentLine()\<CR>"
@@ -194,7 +234,7 @@ nnoremap <leader>w :w<CR>
 nnoremap <leader>i q:inorm! gg=G<CR>
 
 "send to blackhole register
-nnoremap <leader>r "_d
+"nnoremap <leader>r "_d
 nnoremap <leader>n q:inorm<space>
 nnoremap <leader>p zfip
 nnoremap <leader>u za
@@ -204,11 +244,12 @@ nnoremap <leader>z :%s/\<<C-r>=expand("<cword>")<CR>\>/
 nnoremap <leader>; ,
 nnoremap <silent> <leader>t :call RotateColorTheme()<CR>
 nnoremap <leader>ev :e $MYVIMRC<cr>
-nnoremap <leader>a :Ack<Space><c-r><c-W><CR>
-nmap <silent> <Leader><Leader> :LustyJuggler<CR>
+nnoremap <leader>a :Rg<Space><c-r><c-W><CR>
+"nmap <silent> <Leader><Leader> :LustyJuggler<CR>
+nmap <silent> <Leader><Leader> :Buffers<CR>
 
 """"""""""""""""""""""unicode character mappings"""""""""""""""""""""""""""""
-nnoremap <leader>u :call Unicodify()<CR>
+"nnoremap <leader>u :call Unicodify()<CR>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <CR> @:
 nnoremap <C-b> <esc>:buffers<cr>
@@ -242,141 +283,7 @@ let g:gundo_close_on_revert = 1
 let g:gundo_preview_height = 15
 let g:gundo_width = 45
 ":::::::::::::::::::::::::Gundo::::::::::::::::::::::::::::::::::::::::::::::::
-"
-":::::::::::::::::::::::::CTRLP::::::::::::::::::::::::::::::::::::::::::::::::
-"Use this option to change the mapping to invoke CtrlP in |Normal| mode: >
-let g:ctrlp_map = g:leader_prime . 's'
 
-"Set the default opening command to use when pressing the above mapping: >
-let g:ctrlp_cmd = 'CtrlPMixed'
-
-"Set the maximum height of the match window: >
-let g:ctrlp_max_height = 20
-
-"When opening a file with <cr> or <c-t>, if the file's already opened somewhere
-"CtrlP will try to jump to it instead of opening a new instance: >
-let g:ctrlp_switch_buffer = 1
-
-"When starting up, CtrlP sets its local working directory according to this
-"variable: >
-let g:ctrlp_working_path_mode = 'rc'
-
-
-let g:ctrlp_root_markers = ['.cabal', 'Gemfile', '.git']
-
-"Set this to 0 to enable cross-session caching by not deleting the cache files
-"upon exiting Vim: >
-let g:ctrlp_clear_cache_on_exit = 0
-
-"Set the directory to store the cache files: >
-let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
-
-"The maximum number of files to scan, set to 0 for no limit: >
-let g:ctrlp_max_files = 100000
-
-"The maximum depth of a directory tree to recurse into: >
-let g:ctrlp_max_depth = 40
-
-"Use this option to specify how the newly created file is to be opened when
-"pressing <c-y>:
-"  t - in a new tab
-"  h - in a new horizontal split
-"  v - in a new vertical split
-"  r - in the current window
-let g:ctrlp_open_new_file = 'r'
-
-let g:ctrlp_open_multiple_files = 'ri'
-
-"If non-zero, CtrlP will follow symbolic links when listing files: >
-let g:ctrlp_follow_symlinks = 0
-
-
-
-let g:ctrlp_prompt_mappings = {
-      \ 'PrtBS()':              ['<bs>', '<c-]>'],
-      \ 'PrtDelete()':          ['<del>'],
-      \ 'PrtDeleteWord()':      ['<c-w>'],
-      \ 'PrtClear()':           ['<c-u>'],
-      \ 'PrtSelectMove("j")':   ['<c-j>', '<down>'],
-      \ 'PrtSelectMove("k")':   ['<c-k>', '<up>'],
-      \ 'PrtSelectMove("t")':   ['<Home>', '<kHome>'],
-      \ 'PrtSelectMove("b")':   ['<End>', '<kEnd>'],
-      \ 'PrtSelectMove("u")':   ['<PageUp>', '<kPageUp>'],
-      \ 'PrtSelectMove("d")':   ['<PageDown>', '<kPageDown>'],
-      \ 'PrtHistory(-1)':       ['<c-n>'],
-      \ 'PrtHistory(1)':        ['<c-p>'],
-      \ 'AcceptSelection("e")': ['<cr>', '<2-LeftMouse>'],
-      \ 'AcceptSelection("h")': ['<c-x>', '<c-cr>', '<c-s>'],
-      \ 'AcceptSelection("t")': ['<c-t>'],
-      \ 'AcceptSelection("v")': ['<c-v>', '<RightMouse>'],
-      \ 'ToggleFocus()':        ['<c-j><k>'],
-      \ 'ToggleRegex()':        ['<c-r>'],
-      \ 'ToggleByFname()':      ['<c-d>'],
-      \ 'ToggleType(1)':        ['<c-f>', '<c-up>'],
-      \ 'ToggleType(-1)':       ['<c-b>', '<c-down>'],
-      \ 'PrtExpandDir()':       ['<tab>'],
-      \ 'PrtInsert("c")':       ['<MiddleMouse>', '<insert>'],
-      \ 'PrtInsert()':          ['<c-\>'],
-      \ 'PrtCurStart()':        ['<c-a>'],
-      \ 'PrtCurEnd()':          ['<c-e>'],
-      \ 'PrtCurLeft()':         ['<c-h>', '<left>', '<c-^>'],
-      \ 'PrtCurRight()':        ['<c-l>', '<right>'],
-      \ 'PrtClearCache()':      ['<F5>'],
-      \ 'PrtDeleteEnt()':       ['<F7>'],
-      \ 'CreateNewFile()':      ['<c-y>'],
-      \ 'MarkToOpen()':         ['<c-o>'],
-      \ 'OpenMulti()':          ['<c-u>'],
-      \ 'PrtExit()':            ['<esc>', '<c-c>', '<c-g>'],
-      \ }
-":::::::::::::::::::::::::CTRLP::::::::::::::::::::::::::::::::::::::::::::::::
-"
-":::::::::::::::::::::::::NEOCOMPL:::::::::::::::::::::::::::::::::::::::::::::
-let g:neocomplcache_enable_at_startup = 1
-" Disable AutoComplPop.
-let g:acp_enableAtStartup = 0
-" Use neocomplcache.
-let g:neocomplcache_enable_at_startup = 1
-" Use smartcase.
-let g:neocomplcache_enable_smart_case = 1
-" Use camel case completion.
-let g:neocomplcache_enable_camel_case_completion = 1
-" Use underbar completion.
-let g:neocomplcache_enable_underbar_completion = 1
-" Set minimum syntax keyword length.
-let g:neocomplcache_min_syntax_length = 3
-let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
-
-" Define dictionary.
-let g:neocomplcache_dictionary_filetype_lists = {
-      \ 'default' : '',
-      \ 'vimshell' : $HOME.'/.vimshell_hist',
-      \ 'scheme' : $HOME.'/.gosh_completions'
-      \ }
-
-" Define keyword.
-if !exists('g:neocomplcache_keyword_patterns')
-  let g:neocomplcache_keyword_patterns = {}
-endif
-let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
-
-" Recommended key-mappings.
-" <CR>: close popup and save indent.
-inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
-" <TAB>: completion.
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-
-" Enable heavy omni completion.
-if !exists('g:neocomplcache_omni_patterns')
-  let g:neocomplcache_omni_patterns = {}
-endif
-let g:neocomplcache_omni_patterns.ruby = '[^.  *\t]\.\w*\|\h\w*::'
-"autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
-let g:neocomplcache_omni_patterns.php = '[^.  \t]->\h\w*\|\h\w*::'
-let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
-let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
-
-
-":::::::::::::::::::::::::NEOCOMPL:::::::::::::::::::::::::::::::::::::::::::::
 ":::::::::::::::::::::::::helper functions:::::::::::::::::::::::::::::::::::::
 function! CmdLine(str)
   exe "menu Foo.Bar :" . a:str
@@ -431,10 +338,16 @@ function! Unicodify()
   exe '.s/ => / ⇒ /e'
 endfunction
 
+"function! ExecuteCurrentLine()
+"  exe ". !sh"
+"endfunction
+
 function! ExecuteCurrentLine()
-  let l:com = getline('.')
+  let l:com = substitute(getline('.'), '\#', '\\#', '')
+  exe "norm! mc"
   exe "norm! o\<Esc>"
   exe "r! " . l:com
+  exe "norm! mr"
   exe "norm! o\<Esc>"
 endfunction
 
@@ -444,13 +357,6 @@ function! ExecuteCurrentParagraph()
   let l:start = line('.')
   exe "norm! }"
   let l:end = line('.')
-
-"  if l:end == l:init && l:start == l:init
-"    exe 'norm! ' . l:init . 'gg'
-"    call ExecuteCurrentLine()
-"    return
-"  endif
-
   exe "norm! o\<Esc>"
   exe "r! " . join(getline(l:start,l:end), ' ')
   exe "norm! o\<Esc>"
@@ -459,7 +365,7 @@ endfunction
 function! ExecuteCurrentLineWithBC()
   let l:com = getline('.')
   exe "norm! o\<Esc>"
-  exe "r! " . "echo 'scale=6;" . l:com . "' | bc"
+  exe "r! " . "echo 'scale=12;" . l:com . "' | bc"
   exe "norm! o\<Esc>"
 endfunction
 
@@ -469,14 +375,13 @@ let g:EasyMotion_do_mapping = 0 " Disable default mappings
 "Bi-directional find motion
 " Jump to anywhere you want with minimal keystrokes, with just one key
 "binding.
-nmap f <Plug>(easymotion-s)
+"nmap f <Plug>(easymotion-s)
+nmap f <Plug>(easymotion-bd-f)
 
 "nmap <leader>j <Plug>(easymotion-j)
 "nmap <leader>k <Plug>(easymotion-k)
 "nmap <C-f> <Plug>(easymotion-lineforward)
 "nmap <C-d> <Plug>(easymotion-linebackward)
-
-
 let g:EasyMotion_startofline = 0 " keep cursor colum when JK motion
 
 " Turn on case sensitive feature
@@ -512,4 +417,5 @@ function! RotateColorTheme()
   execute ":colorscheme ".newtheme
   hi CursorLine term=none cterm=none ctermbg=4
 endfunction
+
 "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
