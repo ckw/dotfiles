@@ -89,8 +89,8 @@ alias egrep='egrep --color=auto'
 alias ll='ls --color=auto -alF'
 alias la='ls --color=auto -lAh'
 alias l='ls --color=auto -BlFhA'
-alias ag='ack-grep -i'
-alias aga='ack-grep -i -C 5'
+alias ag='rg -i'
+alias aga='rg -i -C 5'
 alias r='rg -i '
 alias red='redis-cli'
 alias reds='redis-server'
@@ -208,7 +208,7 @@ autoload -U compinit && compinit -u
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-export PATH=$(dedup-path)
+#export PATH=$(dedup-path)
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
