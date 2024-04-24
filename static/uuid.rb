@@ -14,9 +14,9 @@ if help || ARGV.length > 0
 end
 
 if check_unique
-  uuids = `ack-grep -h -o #{uuidReg}`.split("\n")
+  uuids = `rg -h -o #{uuidReg}`.split("\n")
   dups = uuids.group_by{ |e| e }.select { |k, v| v.size > 1 }.map(&:first)
   dups.empty? ? (exit;) : (dups.each{|u| puts u}; exit 1)
 end
 
-puts `ack-grep '#{uuidReg}'`
+puts `rg '#{uuidReg}'`
