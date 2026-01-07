@@ -1,51 +1,69 @@
 #!/usr/bin/env python3
 """
-git_dstats.py
+gstats - Git diff statistics with filtering
 
-Given one or two git revisions, print:
-- git diff --stat <A>..<B>
-- non-merge commit count in that range
-- date range covered by non-merge commits in that range
-- "active days" count (unique YYYY-MM-DD with >=1 non-merge commit)
+Shows git diff --stat plus non-merge commit count, date range, and active days.
+Supports filtering by file type and time range.
 
 Usage:
-  python git_dstats.py <revA> [revB]
-  # revB defaults to HEAD
-Examples:
-  python git_dstats.py main
-  python git_dstats.py main HEAD
-  python git_dstats.py v1.2.0..v1.3.0   (works too; see note below)
+  gstats [OPTIONS] <revA> [revB]
+  gstats [OPTIONS] <revA>..<revB>
 
-Note:
-- If you pass a single argument containing ".." (e.g. main..HEAD),
-  the script will treat it as the range.
+Options:
+  --ft <types>      Filter by file extensions (comma-separated, no dots)
+                    Use - prefix to blacklist (e.g., -md)
+                    Aliases: code, docs, config, test
+  --time <expr>     Filter by time range
+                    Relative: 'last 2w', 'last 3m', 'last 24h'
+                    Absolute: '2024-01-15..', '..2024-02-15'
+  --explain         Show parsed filters and exit
+  --verbose, -v     Show detailed filter information
 """
 
 import argparse
+import re
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 
-def run_git(args, check=True, capture=True, text=True):
+# Built-in filetype aliases
+FT_ALIASES = {
+    "code": ["py", "js", "ts", "jsx", "tsx", "go", "rs", "c", "cpp", "h", "hpp",
+             "java", "rb", "php", "swift", "kt", "scala", "sh", "bash", "zsh",
+             "cs", "fs", "ml", "hs", "lua", "pl", "r", "m", "mm"],
+    "docs": ["md", "rst", "txt", "adoc", "org", "tex"],
+    "config": ["json", "yaml", "yml", "toml", "ini", "xml", "conf", "cfg"],
+    "test": [],  # Special handling via patterns
+}
+
+# Patterns for 'test' alias
+TEST_PATTERNS = [
+    r"\.test\.[^.]+$",
+    r"\.spec\.[^.]+$",
+    r"_test\.[^.]+$",
+    r"_spec\.[^.]+$",
+]
+
+
+def run_git(args, check=True):
+    """Run a git command and return the result."""
     cmd = ["git", *args]
     try:
-        if capture:
-            return subprocess.run(cmd, check=check, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=text)
-        else:
-            return subprocess.run(cmd, check=check)
+        return subprocess.run(
+            cmd, check=check, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
     except subprocess.CalledProcessError as e:
-        # Print stderr nicely then exit non-zero
-        if hasattr(e, "stderr") and e.stderr:
+        if e.stderr:
             sys.stderr.write(e.stderr)
-        else:
-            sys.stderr.write(str(e) + "\n")
         raise
 
 
-def parse_range(rev_a: str, rev_b: str | None) -> tuple[str, str]:
-    # Allow passing "A..B" as the first arg (then ignore rev_b if provided)
-    if ".." in rev_a and rev_b is None:
+def parse_rev_range(rev_a: str | None, rev_b: str | None) -> tuple[str, str] | None:
+    """Parse revision range arguments. Returns None if no revisions specified."""
+    if rev_a is None:
+        return None
+    if ".." in rev_a:
         left, right = rev_a.split("..", 1)
         left = left.strip() or "HEAD"
         right = right.strip() or "HEAD"
@@ -53,66 +71,486 @@ def parse_range(rev_a: str, rev_b: str | None) -> tuple[str, str]:
     return rev_a, (rev_b or "HEAD")
 
 
-def to_iso_date_from_unix(ts: int) -> str:
+def parse_ft_arg(ft_arg: str) -> tuple[set[str], set[str], bool]:
+    """
+    Parse --ft argument into whitelist and blacklist sets.
+    Returns (whitelist, blacklist, has_test_alias).
+    """
+    whitelist = set()
+    blacklist = set()
+    has_test_alias = False
+
+    parts = [p.strip() for p in ft_arg.split(",") if p.strip()]
+
+    for part in parts:
+        is_blacklist = part.startswith("-")
+        name = part[1:] if is_blacklist else part
+        name_lower = name.lower()
+
+        # Check if it's an alias
+        if name_lower in FT_ALIASES:
+            if name_lower == "test":
+                if is_blacklist:
+                    pass  # Can't really blacklist test pattern easily, ignore
+                else:
+                    has_test_alias = True
+            else:
+                exts = FT_ALIASES[name_lower]
+                if is_blacklist:
+                    blacklist.update(exts)
+                else:
+                    whitelist.update(exts)
+        else:
+            # It's a direct extension
+            if is_blacklist:
+                blacklist.add(name_lower)
+            else:
+                whitelist.add(name_lower)
+
+    # Remove blacklisted items from whitelist
+    whitelist -= blacklist
+
+    return whitelist, blacklist, has_test_alias
+
+
+def subtract_months(dt: datetime, months: int) -> datetime:
+    """Subtract calendar months from a datetime."""
+    year = dt.year
+    month = dt.month - months
+    while month <= 0:
+        month += 12
+        year -= 1
+    # Handle day overflow (e.g., Mar 31 - 1 month = Feb 28/29)
+    day = min(dt.day, [31, 29 if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0) else 28,
+                       31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1])
+    return dt.replace(year=year, month=month, day=day)
+
+
+def parse_time_arg(time_arg: str) -> tuple[datetime | None, datetime | None]:
+    """
+    Parse --time argument into (since, until) datetime objects.
+    Returns (None, None) if parsing fails.
+    """
+    time_arg = time_arg.strip()
+    now = datetime.now(timezone.utc)
+
+    # Relative time: "last Nunit"
+    rel_match = re.match(r"last\s+(\d+)\s*([hdwmy])", time_arg, re.IGNORECASE)
+    if rel_match:
+        n = int(rel_match.group(1))
+        unit = rel_match.group(2).lower()
+
+        if unit == "h":
+            since = now - timedelta(hours=n)
+        elif unit == "d":
+            since = now - timedelta(days=n)
+        elif unit == "w":
+            since = now - timedelta(weeks=n)
+        elif unit == "m":
+            since = subtract_months(now, n)
+        elif unit == "y":
+            since = subtract_months(now, n * 12)
+        else:
+            return None, None
+
+        return since, None
+
+    # Absolute date range: "YYYY-MM-DD..YYYY-MM-DD" or open-ended
+    range_match = re.match(r"^(\d{4}-\d{2}-\d{2})?\.\.(\d{4}-\d{2}-\d{2})?$", time_arg)
+    if range_match:
+        since_str, until_str = range_match.groups()
+        since = None
+        until = None
+
+        if since_str:
+            since = datetime.strptime(since_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        if until_str:
+            # End of day for until
+            until = datetime.strptime(until_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            until = until + timedelta(days=1) - timedelta(seconds=1)
+
+        return since, until
+
+    return None, None
+
+
+def get_file_extension(filename: str) -> str | None:
+    """Get the final extension of a file (lowercase, without dot). Returns None for extensionless."""
+    if "/" in filename:
+        filename = filename.rsplit("/", 1)[-1]
+
+    if "." not in filename:
+        return None
+
+    ext = filename.rsplit(".", 1)[-1].lower()
+    return ext if ext else None
+
+
+def is_test_file(filename: str) -> bool:
+    """Check if filename matches test patterns."""
+    for pattern in TEST_PATTERNS:
+        if re.search(pattern, filename, re.IGNORECASE):
+            return True
+    return False
+
+
+def file_matches_filter(
+    filename: str,
+    whitelist: set[str],
+    blacklist: set[str],
+    has_test_alias: bool
+) -> bool:
+    """Check if a file matches the filetype filter."""
+    ext = get_file_extension(filename)
+
+    # Extensionless files excluded when whitelist is active
+    if ext is None:
+        if whitelist or has_test_alias:
+            return False
+        return True
+
+    # Check blacklist first
+    if ext in blacklist:
+        return False
+
+    # If we have a whitelist or test alias, file must match one of them
+    if whitelist or has_test_alias:
+        if ext in whitelist:
+            return True
+        if has_test_alias and is_test_file(filename):
+            return True
+        return False
+
+    # No whitelist = include all (except blacklisted, already checked)
+    return True
+
+
+def is_binary_file(filename: str, rev: str) -> bool:
+    """Check if a file is binary in the given revision."""
+    try:
+        result = run_git(["diff", "--numstat", f"{rev}^..{rev}", "--", filename], check=False)
+        if result.returncode != 0:
+            return False
+        # Binary files show as "-\t-\t" in numstat
+        for line in result.stdout.strip().splitlines():
+            if line.startswith("-\t-\t"):
+                return True
+        return False
+    except Exception:
+        return False
+
+
+def get_commits_in_range(rev_range: str, since: datetime | None, until: datetime | None) -> list[dict]:
+    """
+    Get all non-merge commits in the range, optionally filtered by time.
+    Returns list of dicts with 'sha', 'timestamp', 'date'.
+    """
+    args = ["log", "--no-merges", "--format=%H|%ct|%ad", "--date=short", rev_range]
+
+    if since:
+        args.append(f"--since={since.isoformat()}")
+    if until:
+        args.append(f"--until={until.isoformat()}")
+
+    result = run_git(args)
+    commits = []
+
+    for line in result.stdout.strip().splitlines():
+        if not line.strip():
+            continue
+        parts = line.split("|")
+        if len(parts) >= 3:
+            commits.append({
+                "sha": parts[0],
+                "timestamp": int(parts[1]),
+                "date": parts[2],
+            })
+
+    return commits
+
+
+def get_files_changed_in_commit(sha: str) -> list[str]:
+    """Get list of files changed in a commit."""
+    result = run_git(["diff-tree", "--no-commit-id", "--name-only", "-r", sha])
+    return [f for f in result.stdout.strip().splitlines() if f.strip()]
+
+
+def get_diff_stat_for_files(rev_range: str, files: list[str]) -> tuple[str, dict]:
+    """
+    Get diff --stat output for specific files.
+    Returns (stat_output, totals_dict).
+    """
+    if not files:
+        return "", {"files": 0, "insertions": 0, "deletions": 0}
+
+    args = ["diff", "--stat", rev_range, "--"] + files
+    result = run_git(args)
+    output = result.stdout.rstrip("\n")
+
+    # Parse the summary line for totals
+    totals = {"files": 0, "insertions": 0, "deletions": 0}
+    lines = output.splitlines()
+    if lines:
+        summary = lines[-1]
+        # Match patterns like "5 files changed, 100 insertions(+), 20 deletions(-)"
+        files_match = re.search(r"(\d+)\s+files?\s+changed", summary)
+        ins_match = re.search(r"(\d+)\s+insertions?\(\+\)", summary)
+        del_match = re.search(r"(\d+)\s+deletions?\(-\)", summary)
+
+        if files_match:
+            totals["files"] = int(files_match.group(1))
+        if ins_match:
+            totals["insertions"] = int(ins_match.group(1))
+        if del_match:
+            totals["deletions"] = int(del_match.group(1))
+
+    return output, totals
+
+
+def get_full_diff_stat(rev_range: str) -> tuple[str, dict]:
+    """Get full diff --stat output and totals."""
+    result = run_git(["diff", "--stat", rev_range])
+    output = result.stdout.rstrip("\n")
+
+    totals = {"files": 0, "insertions": 0, "deletions": 0}
+    lines = output.splitlines()
+    if lines:
+        summary = lines[-1]
+        files_match = re.search(r"(\d+)\s+files?\s+changed", summary)
+        ins_match = re.search(r"(\d+)\s+insertions?\(\+\)", summary)
+        del_match = re.search(r"(\d+)\s+deletions?\(-\)", summary)
+
+        if files_match:
+            totals["files"] = int(files_match.group(1))
+        if ins_match:
+            totals["insertions"] = int(ins_match.group(1))
+        if del_match:
+            totals["deletions"] = int(del_match.group(1))
+
+    return output, totals
+
+
+def to_iso_date(ts: int) -> str:
+    """Convert unix timestamp to ISO date string."""
     return datetime.fromtimestamp(ts, tz=timezone.utc).date().isoformat()
 
 
+def format_time_range(since: datetime | None, until: datetime | None) -> str:
+    """Format time range for display."""
+    if since and until:
+        return f"{since.strftime('%Y-%m-%d')}..{until.strftime('%Y-%m-%d')}"
+    elif since:
+        return f"{since.strftime('%Y-%m-%d')}.."
+    elif until:
+        return f"..{until.strftime('%Y-%m-%d')}"
+    return ""
+
+
+def build_summary_line(filtered: dict, original: dict) -> str:
+    """Build summary line showing filtered (of total) stats."""
+    parts = []
+
+    if filtered["files"] == original["files"]:
+        parts.append(f"{filtered['files']} files changed")
+    else:
+        parts.append(f"{filtered['files']} files changed (of {original['files']} total)")
+
+    if filtered["insertions"] > 0 or original["insertions"] > 0:
+        if filtered["insertions"] == original["insertions"]:
+            parts.append(f"{filtered['insertions']} insertions(+)")
+        else:
+            parts.append(f"{filtered['insertions']} insertions(+) (of {original['insertions']} total)")
+
+    if filtered["deletions"] > 0 or original["deletions"] > 0:
+        if filtered["deletions"] == original["deletions"]:
+            parts.append(f"{filtered['deletions']} deletions(-)")
+        else:
+            parts.append(f"{filtered['deletions']} deletions(-) (of {original['deletions']} total)")
+
+    return ", ".join(parts) if parts else "(no changes)"
+
+
 def main():
-    p = argparse.ArgumentParser(description="Show git diff --stat plus non-merge commit count + date range + active days.")
-    p.add_argument("revA", help="Left side revision (e.g. main, tag, sha). You can also pass 'A..B' here.")
-    p.add_argument("revB", nargs="?", default=None, help="Right side revision (defaults to HEAD).")
+    p = argparse.ArgumentParser(
+        description="Git diff statistics with filtering.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  gstats main                              Compare main to HEAD
+  gstats --ft py,js main..HEAD             Only Python and JavaScript files
+  gstats --ft code,-test main              All code except test files
+  gstats --time 'last 2w' main             Last 2 weeks
+  gstats --time '2024-01-01..' main        Since Jan 1, 2024
+  gstats --ft py --time 'last 1m' main     Python files in last month
+  gstats --explain --ft code main          Show what filters would apply
+"""
+    )
+    p.add_argument("--ft", metavar="TYPES",
+                   help="Filter by file extensions (comma-separated). Use - prefix to blacklist. Aliases: code, docs, config, test")
+    p.add_argument("--time", metavar="EXPR", dest="time_range",
+                   help="Filter by time range. Relative: 'last 2w'. Absolute: '2024-01-15..'")
+    p.add_argument("--explain", action="store_true",
+                   help="Show parsed filters and exit")
+    p.add_argument("--verbose", "-v", action="store_true",
+                   help="Show detailed filter information")
+    p.add_argument("revA", nargs="?", default=None,
+                   help="Left side revision (e.g. main, tag, sha). You can also pass 'A..B' here.")
+    p.add_argument("revB", nargs="?", default=None,
+                   help="Right side revision (defaults to HEAD).")
+
     args = p.parse_args()
 
-    revA, revB = parse_range(args.revA, args.revB)
+    # No arguments = show help
+    if args.revA is None and args.time_range is None and args.ft is None:
+        p.print_help()
+        sys.exit(0)
+
+    # Parse filters
+    whitelist, blacklist, has_test_alias = set(), set(), False
+    if args.ft:
+        whitelist, blacklist, has_test_alias = parse_ft_arg(args.ft)
+
+    since, until = None, None
+    if args.time_range:
+        since, until = parse_time_arg(args.time_range)
+        if since is None and until is None:
+            sys.stderr.write(f"Error: Could not parse time range: {args.time_range}\n")
+            sys.exit(1)
+
+    has_ft_filter = bool(whitelist or blacklist or has_test_alias)
+    has_time_filter = since is not None or until is not None
+
+    # --explain mode
+    if args.explain:
+        print("Filters:")
+        if has_ft_filter:
+            parts = []
+            if whitelist:
+                parts.append(f"whitelist=[{', '.join(sorted(whitelist))}]")
+            if blacklist:
+                parts.append(f"blacklist=[{', '.join(sorted(blacklist))}]")
+            if has_test_alias:
+                parts.append("test-patterns=enabled")
+            print(f"  ft: {', '.join(parts)}")
+        else:
+            print("  ft: (none)")
+
+        if has_time_filter:
+            print(f"  time: {format_time_range(since, until)}")
+        else:
+            print("  time: (none)")
+        sys.exit(0)
+
+    # Parse revision range
+    rev_tuple = parse_rev_range(args.revA, args.revB)
+    if rev_tuple is None:
+        # Time filter but no revision = HEAD only
+        if has_time_filter:
+            rev_tuple = ("HEAD~1000", "HEAD")  # Approximate: get commits reachable from HEAD
+        else:
+            p.print_help()
+            sys.exit(0)
+
+    revA, revB = rev_tuple
     rng = f"{revA}..{revB}"
 
-    # 1) Diff stat
-    diff = run_git(["diff", "--stat", rng]).stdout.rstrip("\n")
+    # Get original (unfiltered) stats for comparison
+    original_diff, original_totals = get_full_diff_stat(rng)
 
-    # 2) Non-merge commit count
-    count_str = run_git(["rev-list", "--count", "--no-merges", rng]).stdout.strip()
-    try:
-        non_merge_count = int(count_str)
-    except ValueError:
-        non_merge_count = 0
+    # Get commits (with time filter if applicable)
+    all_commits = get_commits_in_range(rng, since, until)
 
-    # 3) Date range + active days (unique YYYY-MM-DD) for non-merge commits
-    # Get commit timestamps (unix) and short dates for uniqueness.
-    # Using --reverse makes it easy to take first/last if needed, but we’ll compute min/max anyway.
-    log_ct = run_git(["log", "--no-merges", "--format=%ct", rng]).stdout.strip().splitlines()
-    log_days = run_git(["log", "--no-merges", "--date=short", "--format=%ad", rng]).stdout.strip().splitlines()
+    # Apply filetype filter if needed
+    if has_ft_filter:
+        # Track which files match across all commits
+        all_matching_files = set()
+        filtered_commits = []
+        excluded_by_ft = 0
 
-    active_days = len(set(d for d in log_days if d))
+        for commit in all_commits:
+            files = get_files_changed_in_commit(commit["sha"])
+            matching_files = [f for f in files if file_matches_filter(f, whitelist, blacklist, has_test_alias)]
 
-    if log_ct:
-        times = []
-        for s in log_ct:
-            s = s.strip()
-            if not s:
-                continue
-            try:
-                times.append(int(s))
-            except ValueError:
-                pass
+            # Exclude binary files
+            matching_files = [f for f in matching_files if not is_binary_file(f, commit["sha"])]
 
-        if times:
-            start_date = to_iso_date_from_unix(min(times))
-            end_date = to_iso_date_from_unix(max(times))
-            date_range_str = f"{start_date} → {end_date} (UTC)"
+            if matching_files:
+                filtered_commits.append(commit)
+                all_matching_files.update(matching_files)
+            else:
+                excluded_by_ft += 1
+
+        # Get filtered diff stats
+        if all_matching_files:
+            filtered_diff, filtered_totals = get_diff_stat_for_files(rng, list(all_matching_files))
         else:
-            date_range_str = "N/A"
+            filtered_diff = ""
+            filtered_totals = {"files": 0, "insertions": 0, "deletions": 0}
+
+        commits_for_stats = filtered_commits
+    else:
+        filtered_diff = original_diff
+        filtered_totals = original_totals
+        commits_for_stats = all_commits
+        excluded_by_ft = 0
+
+    # Calculate time-excluded commits (for verbose output)
+    if has_time_filter and args.verbose:
+        all_commits_no_time = get_commits_in_range(rng, None, None)
+        excluded_by_time = len(all_commits_no_time) - len(all_commits)
+    else:
+        excluded_by_time = 0
+
+    # Calculate stats
+    non_merge_count = len(commits_for_stats)
+    active_days = len(set(c["date"] for c in commits_for_stats))
+
+    if commits_for_stats:
+        times = [c["timestamp"] for c in commits_for_stats]
+        start_date = to_iso_date(min(times))
+        end_date = to_iso_date(max(times))
+        date_range_str = f"{start_date} → {end_date} (UTC)"
     else:
         date_range_str = "N/A"
 
-    # Output
-    print(diff if diff else "(no diff)")
-    print(f"Range: {rng}")
+    # Build output
+    # Diff stats
+    if has_ft_filter and filtered_totals != original_totals:
+        # Show filtered diff without summary, then custom summary
+        diff_lines = filtered_diff.splitlines()
+        if diff_lines:
+            # Remove the original summary line and add our custom one
+            if re.search(r"\d+\s+files?\s+changed", diff_lines[-1]):
+                diff_lines = diff_lines[:-1]
+            for line in diff_lines:
+                print(line)
+            print(f" {build_summary_line(filtered_totals, original_totals)}")
+        else:
+            print("(no diff)")
+    else:
+        print(filtered_diff if filtered_diff else "(no diff)")
+
+    # Range line
+    range_parts = [f"Range: {rng}"]
+    if has_time_filter:
+        range_parts.append(f"Time: {format_time_range(since, until)}")
+    print(" | ".join(range_parts))
+
+    # Stats
     print(f"Non-merge commits: {non_merge_count}")
     print(f"Date range (non-merge): {date_range_str}")
     print(f"Active days (non-merge): {active_days}")
-    print()
 
-    # Exit code: 0 always unless git commands failed earlier.
+    # Verbose filter info
+    if args.verbose and (excluded_by_time > 0 or excluded_by_ft > 0):
+        filter_info = []
+        if excluded_by_time > 0:
+            filter_info.append(f"{excluded_by_time} commits excluded by time filter")
+        if excluded_by_ft > 0:
+            filter_info.append(f"{excluded_by_ft} commits excluded by filetype filter")
+        print(f"Filters: {', '.join(filter_info)}")
+
+    print()
 
 
 if __name__ == "__main__":
