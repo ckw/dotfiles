@@ -457,15 +457,16 @@ Examples:
     if time_only_mode:
         # No revision specified, just time filter - get commits from HEAD
         all_commits = get_commits_in_range("HEAD", since, until)
-        # Compute the effective range from oldest commit to HEAD for diff
+        # Compute the effective range from oldest to newest commit in time range
         if all_commits:
+            newest_sha = all_commits[0]["sha"]   # git log returns newest first
             oldest_sha = all_commits[-1]["sha"]
-            rng = f"{oldest_sha}^..HEAD"
             # Handle case where oldest commit is the root (has no parent)
             try:
                 run_git(["rev-parse", f"{oldest_sha}^"], check=True)
+                rng = f"{oldest_sha}^..{newest_sha}"
             except subprocess.CalledProcessError:
-                rng = f"{oldest_sha}..HEAD"  # Root commit - diff will be empty but that's ok
+                rng = f"{oldest_sha}..{newest_sha}"  # Root commit - include it in diff
         else:
             rng = None
     else:
