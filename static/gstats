@@ -241,12 +241,15 @@ def is_binary_file(filename: str, rev: str) -> bool:
         return False
 
 
-def get_commits_in_range(rev_range: str, since: datetime | None, until: datetime | None) -> list[dict]:
+def get_commits_in_range(rev_spec: str | None, since: datetime | None, until: datetime | None) -> list[dict]:
     """
-    Get all non-merge commits in the range, optionally filtered by time.
+    Get all non-merge commits in the range/ref, optionally filtered by time.
+    rev_spec can be a range like 'main..HEAD', a single ref like 'HEAD', or None (defaults to HEAD).
     Returns list of dicts with 'sha', 'timestamp', 'date'.
     """
-    args = ["log", "--no-merges", "--format=%H|%ct|%ad", "--date=short", rev_range]
+    args = ["log", "--no-merges", "--format=%H|%ct|%ad", "--date=short"]
+    if rev_spec:
+        args.append(rev_spec)
 
     if since:
         args.append(f"--since={since.isoformat()}")
@@ -444,22 +447,37 @@ Examples:
 
     # Parse revision range
     rev_tuple = parse_rev_range(args.revA, args.revB)
-    if rev_tuple is None:
-        # Time filter but no revision = HEAD only
-        if has_time_filter:
-            rev_tuple = ("HEAD~1000", "HEAD")  # Approximate: get commits reachable from HEAD
-        else:
-            p.print_help()
-            sys.exit(0)
+    time_only_mode = rev_tuple is None and has_time_filter
 
-    revA, revB = rev_tuple
-    rng = f"{revA}..{revB}"
-
-    # Get original (unfiltered) stats for comparison
-    original_diff, original_totals = get_full_diff_stat(rng)
+    if rev_tuple is None and not has_time_filter:
+        p.print_help()
+        sys.exit(0)
 
     # Get commits (with time filter if applicable)
-    all_commits = get_commits_in_range(rng, since, until)
+    if time_only_mode:
+        # No revision specified, just time filter - get commits from HEAD
+        all_commits = get_commits_in_range("HEAD", since, until)
+        # Compute the effective range from oldest commit to HEAD for diff
+        if all_commits:
+            oldest_sha = all_commits[-1]["sha"]
+            rng = f"{oldest_sha}^..HEAD"
+            # Handle case where oldest commit is the root (has no parent)
+            try:
+                run_git(["rev-parse", f"{oldest_sha}^"], check=True)
+            except subprocess.CalledProcessError:
+                rng = f"{oldest_sha}..HEAD"  # Root commit - diff will be empty but that's ok
+        else:
+            rng = None
+    else:
+        revA, revB = rev_tuple
+        rng = f"{revA}..{revB}"
+        all_commits = get_commits_in_range(rng, since, until)
+
+    # Get original (unfiltered) stats for comparison
+    if rng:
+        original_diff, original_totals = get_full_diff_stat(rng)
+    else:
+        original_diff, original_totals = "", {"files": 0, "insertions": 0, "deletions": 0}
 
     # Apply filetype filter if needed
     if has_ft_filter:
@@ -482,7 +500,7 @@ Examples:
                 excluded_by_ft += 1
 
         # Get filtered diff stats
-        if all_matching_files:
+        if all_matching_files and rng:
             filtered_diff, filtered_totals = get_diff_stat_for_files(rng, list(all_matching_files))
         else:
             filtered_diff = ""
@@ -496,7 +514,8 @@ Examples:
         excluded_by_ft = 0
 
     # Calculate time-excluded commits (for verbose output)
-    if has_time_filter and args.verbose:
+    if has_time_filter and args.verbose and not time_only_mode:
+        # Only calculate exclusions when we have a revision range to compare against
         all_commits_no_time = get_commits_in_range(rng, None, None)
         excluded_by_time = len(all_commits_no_time) - len(all_commits)
     else:
@@ -532,10 +551,15 @@ Examples:
         print(filtered_diff if filtered_diff else "(no diff)")
 
     # Range line
-    range_parts = [f"Range: {rng}"]
+    range_parts = []
+    if time_only_mode:
+        range_parts.append("Range: HEAD")
+    elif rng:
+        range_parts.append(f"Range: {rng}")
     if has_time_filter:
         range_parts.append(f"Time: {format_time_range(since, until)}")
-    print(" | ".join(range_parts))
+    if range_parts:
+        print(" | ".join(range_parts))
 
     # Stats
     print(f"Non-merge commits: {non_merge_count}")
