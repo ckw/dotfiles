@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+"""
+git_dstats.py
+
+Given one or two git revisions, print:
+- git diff --stat <A>..<B>
+- non-merge commit count in that range
+- date range covered by non-merge commits in that range
+- "active days" count (unique YYYY-MM-DD with >=1 non-merge commit)
+
+Usage:
+  python git_dstats.py <revA> [revB]
+  # revB defaults to HEAD
+Examples:
+  python git_dstats.py main
+  python git_dstats.py main HEAD
+  python git_dstats.py v1.2.0..v1.3.0   (works too; see note below)
+
+Note:
+- If you pass a single argument containing ".." (e.g. main..HEAD),
+  the script will treat it as the range.
+"""
+
+import argparse
+import subprocess
+import sys
+from datetime import datetime, timezone
+
+
+def run_git(args, check=True, capture=True, text=True):
+    cmd = ["git", *args]
+    try:
+        if capture:
+            return subprocess.run(cmd, check=check, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=text)
+        else:
+            return subprocess.run(cmd, check=check)
+    except subprocess.CalledProcessError as e:
+        # Print stderr nicely then exit non-zero
+        if hasattr(e, "stderr") and e.stderr:
+            sys.stderr.write(e.stderr)
+        else:
+            sys.stderr.write(str(e) + "\n")
+        raise
+
+
+def parse_range(rev_a: str, rev_b: str | None) -> tuple[str, str]:
+    # Allow passing "A..B" as the first arg (then ignore rev_b if provided)
+    if ".." in rev_a and rev_b is None:
+        left, right = rev_a.split("..", 1)
+        left = left.strip() or "HEAD"
+        right = right.strip() or "HEAD"
+        return left, right
+    return rev_a, (rev_b or "HEAD")
+
+
+def to_iso_date_from_unix(ts: int) -> str:
+    return datetime.fromtimestamp(ts, tz=timezone.utc).date().isoformat()
+
+
+def main():
+    p = argparse.ArgumentParser(description="Show git diff --stat plus non-merge commit count + date range + active days.")
+    p.add_argument("revA", help="Left side revision (e.g. main, tag, sha). You can also pass 'A..B' here.")
+    p.add_argument("revB", nargs="?", default=None, help="Right side revision (defaults to HEAD).")
+    args = p.parse_args()
+
+    revA, revB = parse_range(args.revA, args.revB)
+    rng = f"{revA}..{revB}"
+
+    # 1) Diff stat
+    diff = run_git(["diff", "--stat", rng]).stdout.rstrip("\n")
+
+    # 2) Non-merge commit count
+    count_str = run_git(["rev-list", "--count", "--no-merges", rng]).stdout.strip()
+    try:
+        non_merge_count = int(count_str)
+    except ValueError:
+        non_merge_count = 0
+
+    # 3) Date range + active days (unique YYYY-MM-DD) for non-merge commits
+    # Get commit timestamps (unix) and short dates for uniqueness.
+    # Using --reverse makes it easy to take first/last if needed, but we’ll compute min/max anyway.
+    log_ct = run_git(["log", "--no-merges", "--format=%ct", rng]).stdout.strip().splitlines()
+    log_days = run_git(["log", "--no-merges", "--date=short", "--format=%ad", rng]).stdout.strip().splitlines()
+
+    active_days = len(set(d for d in log_days if d))
+
+    if log_ct:
+        times = []
+        for s in log_ct:
+            s = s.strip()
+            if not s:
+                continue
+            try:
+                times.append(int(s))
+            except ValueError:
+                pass
+
+        if times:
+            start_date = to_iso_date_from_unix(min(times))
+            end_date = to_iso_date_from_unix(max(times))
+            date_range_str = f"{start_date} → {end_date} (UTC)"
+        else:
+            date_range_str = "N/A"
+    else:
+        date_range_str = "N/A"
+
+    # Output
+    print(diff if diff else "(no diff)")
+    print(f"Range: {rng}")
+    print(f"Non-merge commits: {non_merge_count}")
+    print(f"Date range (non-merge): {date_range_str}")
+    print(f"Active days (non-merge): {active_days}")
+    print()
+
+    # Exit code: 0 always unless git commands failed earlier.
+
+
+if __name__ == "__main__":
+    main()
