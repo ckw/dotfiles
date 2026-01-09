@@ -466,7 +466,9 @@ Examples:
                 run_git(["rev-parse", f"{oldest_sha}^"], check=True, quiet=True)
                 rng = f"{oldest_sha}^..{newest_sha}"
             except subprocess.CalledProcessError:
-                rng = f"{oldest_sha}..{newest_sha}"  # Root commit - include it in diff
+                # Root commit - diff against empty tree to include its changes
+                empty_tree = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+                rng = f"{empty_tree}..{newest_sha}"
         else:
             rng = None
     else:
