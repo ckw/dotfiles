@@ -47,7 +47,7 @@ TEST_PATTERNS = [
 ]
 
 
-def run_git(args, check=True):
+def run_git(args, check=True, quiet=False):
     """Run a git command and return the result."""
     cmd = ["git", *args]
     try:
@@ -55,7 +55,7 @@ def run_git(args, check=True):
             cmd, check=check, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
         )
     except subprocess.CalledProcessError as e:
-        if e.stderr:
+        if e.stderr and not quiet:
             sys.stderr.write(e.stderr)
         raise
 
@@ -463,7 +463,7 @@ Examples:
             oldest_sha = all_commits[-1]["sha"]
             # Handle case where oldest commit is the root (has no parent)
             try:
-                run_git(["rev-parse", f"{oldest_sha}^"], check=True)
+                run_git(["rev-parse", f"{oldest_sha}^"], check=True, quiet=True)
                 rng = f"{oldest_sha}^..{newest_sha}"
             except subprocess.CalledProcessError:
                 rng = f"{oldest_sha}..{newest_sha}"  # Root commit - include it in diff
