@@ -83,14 +83,16 @@ def generate_problem(tables: Sequence[int], rng: random.Random) -> dict[str, int
 
 
 def format_question(problem: dict[str, int]) -> str:
-    return f"{problem['left']} * {problem['right']} = ?"
+    return f'{{"send": true, "message": "{problem['left']} * {problem['right']} = ?"}}'
 
 
 def format_answer(problem: dict[str, int]) -> str:
     left = problem["left"]
     right = problem["right"]
-    return f"{left} * {right} = {left * right}"
+    msg = f'"{left} * {right} = {left * right}"'
+    return f'{{"send": true, "message": {msg}}}'
 
+#   {"send": true, "message": "The notification text"}
 
 def load_problem(state_path: Path) -> dict[str, int] | None:
     try:
