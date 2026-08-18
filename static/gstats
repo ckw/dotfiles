@@ -32,7 +32,7 @@ FT_ALIASES = {
     "code": ["py", "js", "ts", "jsx", "tsx", "go", "rs", "c", "cpp", "h", "hpp",
              "java", "rb", "php", "swift", "kt", "scala", "sh", "bash", "zsh",
              "metal", "hs", "erl", "elixir", "ex", "exs",
-             "cs", "fs", "ml", "hs", "lua", "pl", "r", "m", "mm"],
+             "cs", "fs", "ml", "hs", "lua", "pl", "r", "m", "mm", "gd"],
     "docs": ["md", "rst", "txt", "adoc", "org", "tex"],
     "config": ["json", "yaml", "yml", "toml", "ini", "xml", "conf", "cfg"],
     "test": [],  # Special handling via patterns
