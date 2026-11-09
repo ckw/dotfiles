@@ -1,110 +1,180 @@
 vim.cmd([[
 
 set runtimepath^=~/.vim runtimepath+=~/.vim/after
-let &packpath = &runtimepath
+"let &packpath = &runtimepath
 source ~/.vimrc
 au TextYankPost * silent! lua vim.highlight.on_yank { higroup="IncSearch", timeout=250, on_visual=false }
+
 
 let g:peekup_open = '<leader>r'
 set completeopt=menu,menuone,noselect
 ]]
 )
 
-require('plugins')
-require('nvim-peekup.config').on_keystroke["delay"] = ''
-require("mason").setup()
-require("mason-lspconfig").setup({
-  ensure_installed = { 'elixirls', 'clangd', 'sumneko_lua' }
-}
-)
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
+end
 
-require("lspconfig").elixirls.setup {
-  cmd = { "/home/ckw/elixir-ls/release/language_server.sh"};
+vim.opt.rtp:prepend(lazypath)
+vim.loader.enable()
+--require 'plugins'
+--
+local lazy_plugins = {
+  {'junegunn/fzf'},
+  {'gennaro-tedesco/nvim-peekup'},
+  {'jremmen/vim-ripgrep'},
+  {'easymotion/vim-easymotion'},
+  --, 'mason-lspconfig'
+  --{ 'cmp'},
+  --{ "L3MON4D3/LuaSnip",
+  --	-- follow latest release.
+  --	version = "2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+  --	-- install jsregexp (optional!).
+  --	--build = "make install_jsregexp"
+  --},
+  {'junegunn/fzf.vim'},
+  {'neovim/nvim-lspconfig'},
+  --{'preservim/nerdtree'},
+  {'williamboman/mason.nvim'},
+  {'williamboman/mason-lspconfig.nvim'},
+  {'hrsh7th/nvim-cmp'},
+  {'hrsh7th/cmp-buffer'},
+  {'hrsh7th/cmp-nvim-lsp'},
+  {'hrsh7th/cmp-path'},
+  {'hrsh7th/cmp-vsnip'},
+  {'hrsh7th/vim-vsnip'},
+  --{'hrsh7th/cmp-cmdline'},
+  --{'saadparwaiz1/cmp_luasnip'},
+  {'nvim-lua/plenary.nvim'},
+  {'scalameta/nvim-metals', dependencies = { "nvim-lua/plenary.nvim" }},
+  {
+  --'nvim-telescope/telescope.nvim', tag = '0.1.8',
+  'nvim-telescope/telescope.nvim',
+   --or , branch = '0.1.x',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    defaults = { debug = true },
+  },
+--'mhanberg/elixir.nvim'
+--'elixir-editors/vim-elixir'
+
+--'tikhomirov/vim-glsl'
+  --{
+  --  "tidalcycles/vim-tidal",
+  --  ft = "tidal",
+  --  init = function()
+  --    --vim.g.tidal_no_mappings = 1
+  --    vim.g.maplocalleader = " "                    -- so <localleader>s works
+  --    vim.g.tidal_target   = "terminal"              -- use nvim terminal
+  --    vim.g.tidal_ghci     = "stack exec ghci --"    -- use Stack’s ghci
+  --    vim.g.tidal_boot     = "/Users/ckw/tidal-live/BootTidal.hs" -- your working Boot (new-style)
+  --  end,
+  --  config = function()
+  --    -- buffer-local keymaps for tidal files
+  --    --vim.keymap.set("n","<localleader>d","<Plug>TidalSendLine",{buffer=true})
+  --    --vim.keymap.set("v","<localleader>s","<Plug>TidalSend",   {buffer=true})
+  --    --vim.keymap.set("n","<localleader>a","<Plug>TidalHush",   {buffer=true})
+  --  end
+  --}
+  {
+    --dir = "/Users/ckw/mru-buffer-picker",
+    "ckw/mru-buffer-picker",
+    opts = {
+      --keys = "asdfghjkl;",
+      keys = "asdfjkl;eirughwptyo",
+    },
+    keys = {
+      {
+        "<leader><leader>",
+        function()
+          require("mru_buffer_picker").open()
+        end,
+      },
+    },
+  }
 }
+
+require("lazy").setup(lazy_plugins)
+
+--vim.api.nvim_set_hl(0, "MruBufferPickerHint", {
+--  bg = "#ffffff",
+--  fg = "#ff0000",
+--  bold = true,
+--})
 
 
 local cmp = require('cmp')
-local luasnip = require('luasnip')
-
+--local luasnip = require('luasnip')
+--
 cmp.setup({
   snippet = {
-      -- REQUIRED - you must specify a snippet engine
-      expand = function(args)
-        -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-        require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-        -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
-        -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
-      end,
-    },
-    window = {
-      -- completion = cmp.config.window.bordered(),
-      -- documentation = cmp.config.window.bordered(),
-    },
-    mapping = {
-      ["<C-k>"] = cmp.mapping.scroll_docs(-4),
-      ["<C-j>"] = cmp.mapping.scroll_docs(4),
-      --["<C-k>"] = cmp.mapping.scroll(-1),
-      --["<C-j>"] = cmp.mapping.scroll(1),
-      --["<C-l>"] = cmp.mapping.complete(),
-      ["<C-e>"] = cmp.mapping.close(),
-      ["<C-l>"] = cmp.mapping.confirm({ select = true }),
-      ["<Tab>"] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_next_item()
-        elseif luasnip.expand_or_jumpable() then
-          luasnip.expand_or_jump()
-        else
-          fallback()
-        end
-      end, {"i", "s"}),
-      ["<C-Tab>"] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_prev_item()
-        elseif luasnip.jumpable(-1) then
-          luasnip.jump(-1)
-        else
-          fallback()
-        end
-      end, {"i", "s"}),
+    expand = function(args)
+      vim.fn["vsnip#anonymous"](args.body)
+    end,
+  },
 
-    },
-    sources = {
-      { name = "nvim_lsp" },
-      { name = "luasnip" },
-      { name = "buffer" },
-    },
-  })
+  window = {
+    -- completion = cmp.config.window.bordered(),
+    -- documentation = cmp.config.window.bordered(),
+  },
 
-  -- Set configuration for specific filetype.
-  cmp.setup.filetype('gitcommit', {
-    sources = cmp.config.sources({
-      { name = 'git' }, -- You can specify the `git` source if [you were installed it](https://github.com/petertriho/cmp-git).
-    }, {
-      { name = 'buffer' },
-    })
-  })
+  mapping = cmp.mapping.preset.insert({
+    ["<C-k>"] = cmp.mapping.scroll_docs(-4),
+    ["<C-j>"] = cmp.mapping.scroll_docs(4),
 
-  -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-  cmp.setup.cmdline({ '/', '?' }, {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = {
-      { name = 'buffer' }
-    }
-  })
+    ["<C-e>"] = cmp.mapping.abort(),
 
-  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-  cmp.setup.cmdline(':', {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = cmp.config.sources({
-      { name = 'path' }
-    }, {
-      { name = 'cmdline' }
-    })
-  })
+    ["<C-l>"] = cmp.mapping.confirm({
+      select = true,
+    }),
 
-  -- Set up lspconfig.
-  local capabilities = require('cmp_nvim_lsp').default_capabilities()
-  -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
-  require('lspconfig')['elixirls'].setup {
-    capabilities = capabilities
-  }
+    ["<Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      elseif vim.fn["vsnip#available"](1) == 1 then
+        vim.fn.feedkeys(
+          vim.api.nvim_replace_termcodes(
+            "<Plug>(vsnip-expand-or-jump)",
+            true,
+            true,
+            true
+          ),
+          ""
+        )
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+
+    ["<C-Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif vim.fn["vsnip#jumpable"](-1) == 1 then
+        vim.fn.feedkeys(
+          vim.api.nvim_replace_termcodes(
+            "<Plug>(vsnip-jump-prev)",
+            true,
+            true,
+            true
+          ),
+          ""
+        )
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+  }),
+
+  sources = cmp.config.sources({
+    { name = "nvim_lsp" },
+    { name = "vsnip" },
+    { name = "buffer" },
+  }),
+})

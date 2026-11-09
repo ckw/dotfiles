@@ -177,6 +177,10 @@ noremap <C-h> <C-w>h
 noremap <C-l> <C-w>l
 onoremap <C-l> $
 onoremap <C-h> 0
+vnoremap <C-l> $
+vnoremap <C-h> 0
+nnoremap <C-l> $
+nnoremap <C-h> 0
 nnoremap I gI
 nnoremap gI I
 
@@ -211,6 +215,9 @@ nnoremap <leader>di :set invlist<cr>
 
 nnoremap <leader>dsv :source $MYVIMRC<cr>
 nnoremap <leader>dso :syn on<CR>
+
+nnoremap <C-u> <C-a>
+xnoremap <C-u> <C-a>
 
 "nnoremap <leader>f :FZF<CR>
 
@@ -257,7 +264,8 @@ nnoremap <leader>ev :e $MYVIMRC<cr>
 nnoremap <leader>a :Telescope grep_string<CR>
 "nmap <silent> <Leader><Leader> :LustyJuggler<CR>
 "nmap <silent> <Leader><Leader> :Buffers<CR>
-nmap <silent> <Leader><Leader> :Telescope buffers<CR>
+
+"nmap <silent> <Leader><Leader> :Telescope buffers<CR>
 
 """"""""""""""""""""""unicode character mappings"""""""""""""""""""""""""""""
 "nnoremap <leader>u :call Unicodify()<CR>
@@ -394,7 +402,7 @@ endfunction
 function! ExecuteCurrentLineWithBC()
   let l:com = getline('.')
   exe "norm! o\<Esc>"
-  exe "r! " . "echo 'scale=12;" . l:com . "' | bc"
+  exe "r! " . "echo 'scale=12;" . l:com . "' | bc -l"
   exe "norm! o\<Esc>"
 endfunction
 
