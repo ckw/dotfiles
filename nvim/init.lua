@@ -11,6 +11,21 @@ set completeopt=menu,menuone,noselect
 ]]
 )
 
+-- Over SSH, send yanks to the local terminal's clipboard with OSC 52 (not the
+-- remote Mac's pbcopy). Paste from nvim's own register: reading the clipboard
+-- over OSC 52 makes Ghostty prompt on every `p` (clipboard=unnamedplus).
+if os.getenv("SSH_TTY") then
+  local osc52 = require("vim.ui.clipboard.osc52")
+  local function paste()
+    return { vim.fn.split(vim.fn.getreg(""), "\n"), vim.fn.getregtype("") }
+  end
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = { ["+"] = osc52.copy("+"), ["*"] = osc52.copy("*") },
+    paste = { ["+"] = paste, ["*"] = paste },
+  }
+end
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({

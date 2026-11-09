@@ -26,25 +26,31 @@ Plugin 'VundleVim/Vundle.vim'
 " Keep Plugin commands between vundle#begin/end.
 
 " TODO SURROUND plugin
-Plugin 'junegunn/fzf'
-Plugin 'junegunn/fzf.vim'
-Plugin 'jremmen/vim-ripgrep'
-Plugin 'easymotion/vim-easymotion'
-Plugin 'preservim/nerdtree'
+" Neovim gets these from lazy.nvim (~/.config/nvim/init.lua). Loading Vundle's
+" stale copies too puts them first on the runtimepath and mixes versions.
+if !has('nvim')
+  Plugin 'junegunn/fzf'
+  Plugin 'junegunn/fzf.vim'
+  Plugin 'jremmen/vim-ripgrep'
+  Plugin 'easymotion/vim-easymotion'
 
-Plugin 'williamboman/mason.nvim'
-Plugin 'williamboman/mason-lspconfig.nvim'
-Plugin 'neovim/nvim-lspconfig'
-Plugin 'hrsh7th/nvim-cmp'
-Plugin 'hrsh7th/cmp-buffer'
-Plugin 'hrsh7th/cmp-nvim-lsp'
-Plugin 'hrsh7th/cmp-path'
+  Plugin 'williamboman/mason.nvim'
+  Plugin 'williamboman/mason-lspconfig.nvim'
+  Plugin 'neovim/nvim-lspconfig'
+  Plugin 'hrsh7th/nvim-cmp'
+  Plugin 'hrsh7th/cmp-buffer'
+  Plugin 'hrsh7th/cmp-nvim-lsp'
+  Plugin 'hrsh7th/cmp-path'
+
+  Plugin 'nvim-lua/plenary.nvim'
+endif
+
+Plugin 'preservim/nerdtree'
 Plugin 'hrsh7th/cmp-cmdline'
 
 Plugin 'L3MON4D3/LuaSnip'
 Plugin 'saadparwaiz1/cmp_luasnip'
 
-Plugin 'nvim-lua/plenary.nvim'
 Plugin 'mhanberg/elixir.nvim'
 Plugin 'elixir-editors/vim-elixir'
 
